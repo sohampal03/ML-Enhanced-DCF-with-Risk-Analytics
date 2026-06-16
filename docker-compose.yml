@@ -1,0 +1,110 @@
+version: "3.9"
+
+services:
+  # ── Streamlit Dashboard ──────────────────────────────────────────────────
+  dashboard:
+    build:
+      context: .
+      target: runtime
+    image: valuai:latest
+    container_name: valuai-dashboard
+    ports:
+      - "8501:8501"
+    environment:
+      - PYTHONPATH=/app
+      - DATA_PRIMARY_ADAPTER=yfinance
+      - DB_REDIS_URL=redis://redis:6379/0
+      - DB_URL=postgresql://postgres:valuai_password@postgres:5432/valuation_db
+      - ML_RANDOM_SEED=42
+      - SIM_N_SIMULATIONS=10000
+      - LOG_LEVEL=INFO
+    volumes:
+      - ./data/cache:/app/data/cache
+      - ./models/saved:/app/models/saved
+      - ./logs:/app/logs
+    depends_on:
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - valuai-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8501/_stcore/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ── FastAPI Backend ──────────────────────────────────────────────────────
+  api:
+    build:
+      context: .
+      target: runtime
+    image: valuai:latest
+    container_name: valuai-api
+    command: ["uvicorn", "src.api.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+    ports:
+      - "8000:8000"
+    environment:
+      - PYTHONPATH=/app
+      - DATA_PRIMARY_ADAPTER=yfinance
+      - DB_REDIS_URL=redis://redis:6379/0
+      - DB_URL=postgresql://postgres:valuai_password@postgres:5432/valuation_db
+    volumes:
+      - ./data/cache:/app/data/cache
+      - ./models/saved:/app/models/saved
+    depends_on:
+      - redis
+      - postgres
+    networks:
+      - valuai-network
+
+  # ── Redis Cache ──────────────────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: valuai-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --maxmemory 512mb --maxmemory-policy allkeys-lru
+    restart: unless-stopped
+    networks:
+      - valuai-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # ── PostgreSQL ───────────────────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: valuai-postgres
+    environment:
+      POSTGRES_DB: valuation_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: valuai_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    networks:
+      - valuai-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d valuation_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  redis_data:
+    driver: local
+  postgres_data:
+    driver: local
+
+networks:
+  valuai-network:
+    driver: bridge

@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.backends.legacy:build"
+
+[project]
+name = "ai-business-valuation"
+version = "1.0.0"
+description = "AI-Powered Intelligent Business Valuation Platform"
+readme = "README.md"
+license = { text = "MIT" }
+authors = [{ name = "Quantitative Research Team" }]
+requires-python = ">=3.10"
+
+[project.urls]
+Homepage = "https://github.com/yourusername/ai-business-valuation"
+
+[tool.black]
+line-length = 100
+target-version = ["py310", "py311", "py312"]
+
+[tool.ruff]
+line-length = 100
+select = ["E", "F", "W", "I", "N", "UP", "ANN"]
+ignore = ["ANN101", "ANN102"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = false
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+addopts = "--cov=src --cov-report=html --cov-report=term-missing -v"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["src*", "dashboard*", "configs*"]
