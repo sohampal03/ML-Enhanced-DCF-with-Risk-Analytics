@@ -13,7 +13,6 @@ Intrinsic Value  = Equity Value / Shares Outstanding
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Optional
 
 import numpy as np
 import pandas as pd
@@ -104,7 +103,7 @@ class DCFResult:
     confidence_score: float = 0.5
 
     # Sensitivity matrix
-    sensitivity_matrix: Optional[pd.DataFrame] = None
+    sensitivity_matrix: pd.DataFrame | None = None
 
     def to_summary_dict(self) -> dict:
         return {
@@ -162,18 +161,18 @@ class DCFEngine:
     def compute(
         self,
         data: FinancialData,
-        fcff_result: Optional[FCFFResult] = None,
-        wacc_result: Optional[WACCBreakdown] = None,
+        fcff_result: FCFFResult | None = None,
+        wacc_result: WACCBreakdown | None = None,
         # Manual overrides (for DCF Lab)
-        revenue_growth_rates: Optional[list[float]] = None,
-        ebit_margin: Optional[float] = None,
-        wacc_override: Optional[float] = None,
-        terminal_growth_rate: Optional[float] = None,
+        revenue_growth_rates: list[float] | None = None,
+        ebit_margin: float | None = None,
+        wacc_override: float | None = None,
+        terminal_growth_rate: float | None = None,
         forecast_years: int = 10,
-        tax_rate_override: Optional[float] = None,
-        capex_pct_revenue: Optional[float] = None,
-        da_pct_revenue: Optional[float] = None,
-        nwc_pct_revenue: Optional[float] = None,
+        tax_rate_override: float | None = None,
+        capex_pct_revenue: float | None = None,
+        da_pct_revenue: float | None = None,
+        nwc_pct_revenue: float | None = None,
         build_sensitivity: bool = True,
     ) -> DCFResult:
         """

@@ -11,7 +11,6 @@ Also computes historical FCFF trends and growth rates for forecasting.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Optional
 
 import numpy as np
 import pandas as pd
@@ -31,19 +30,19 @@ class FCFFBreakdown:
     """Detailed FCFF calculation for a single year."""
 
     fiscal_year: int
-    revenue: Optional[float]
-    ebit: Optional[float]
-    tax_rate: Optional[float]
-    nopat: Optional[float]  # EBIT × (1 - Tax Rate)
-    depreciation: Optional[float]
-    capex: Optional[float]
-    delta_nwc: Optional[float]  # Change in Net Working Capital
-    fcff: Optional[float]  # NOPAT + D&A - ΔNWC - CAPEX
+    revenue: float | None
+    ebit: float | None
+    tax_rate: float | None
+    nopat: float | None  # EBIT × (1 - Tax Rate)
+    depreciation: float | None
+    capex: float | None
+    delta_nwc: float | None  # Change in Net Working Capital
+    fcff: float | None  # NOPAT + D&A - ΔNWC - CAPEX
 
     # Derived ratios
-    ebit_margin: Optional[float] = None
-    fcff_margin: Optional[float] = None
-    fcff_growth_rate: Optional[float] = None
+    ebit_margin: float | None = None
+    fcff_margin: float | None = None
+    fcff_growth_rate: float | None = None
 
     def to_dict(self) -> dict:
         return {
@@ -86,8 +85,8 @@ class FCFFResult:
     breakdowns: list[FCFFBreakdown] = field(default_factory=list)
     average_tax_rate: float = 0.21
     average_fcff_growth: float = 0.05
-    latest_fcff: Optional[float] = None
-    median_fcff_margin: Optional[float] = None
+    latest_fcff: float | None = None
+    median_fcff_margin: float | None = None
     formula: str = "FCFF = NOPAT + D&A − ΔNWC − CAPEX"
     notes: list[str] = field(default_factory=list)
 
@@ -172,7 +171,7 @@ class FCFFEngine:
                 bd.fcff_growth_rate = (bd.fcff - prev.fcff) / abs(prev.fcff)
 
         # Summary statistics
-        fcff_values = [b.fcff for b in breakdowns if b.fcff is not None]
+        [b.fcff for b in breakdowns if b.fcff is not None]
         fcff_margins = [b.fcff_margin for b in breakdowns if b.fcff_margin is not None]
         growth_rates = [b.fcff_growth_rate for b in breakdowns if b.fcff_growth_rate is not None]
 
@@ -201,7 +200,7 @@ class FCFFEngine:
         income: AnnualIncomeStatement,
         balance: AnnualBalanceSheet,
         cashflow: AnnualCashFlowStatement,
-        prev_balance: Optional[AnnualBalanceSheet],
+        prev_balance: AnnualBalanceSheet | None,
         avg_tax_rate: float,
     ) -> FCFFBreakdown:
         """Compute FCFF for a single fiscal year."""
@@ -249,7 +248,7 @@ class FCFFEngine:
             fcff_margin=safe_divide(fcff or 0, income.revenue or 1) if fcff else None,
         )
 
-    def _estimate_ebit(self, income: AnnualIncomeStatement) -> Optional[float]:
+    def _estimate_ebit(self, income: AnnualIncomeStatement) -> float | None:
         """Estimate EBIT from available data."""
         if income.ebitda and income.depreciation_amortization:
             return income.ebitda - income.depreciation_amortization

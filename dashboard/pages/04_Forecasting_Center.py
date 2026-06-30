@@ -3,18 +3,17 @@ Page 4: Forecasting Center — ML Model Comparison & Revenue Forecasts
 """
 
 from __future__ import annotations
+
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-import streamlit as st
 import plotly.graph_objects as go
-from plotly.subplots import make_subplots
+import streamlit as st
 
-from dashboard.components.cards import section_divider, metric_card, info_box
-from dashboard.components.charts import revenue_forecast_chart, margin_trend_chart, COLORS
-from src.utils.helpers import format_currency, format_percentage
+from dashboard.components.cards import info_box, section_divider
+from dashboard.components.charts import COLORS, margin_trend_chart, revenue_forecast_chart
 
 st.set_page_config(page_title="Forecasting Center | AlphaForge", layout="wide", page_icon="🤖")
 

@@ -9,18 +9,17 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-import numpy as np
-import streamlit as st
 import plotly.graph_objects as go
+import streamlit as st
 
-from dashboard.components.cards import metric_card, probability_bar, section_divider, info_box
+from dashboard.components.cards import info_box, metric_card, probability_bar, section_divider
 from dashboard.components.charts import (
+    COLORS,
     monte_carlo_histogram,
     tornado_chart,
     violin_plot,
-    COLORS,
 )
-from src.utils.helpers import format_currency, format_percentage
+from src.utils.helpers import format_currency
 
 st.set_page_config(page_title="Risk Analytics | AlphaForge", layout="wide", page_icon="🎲")
 

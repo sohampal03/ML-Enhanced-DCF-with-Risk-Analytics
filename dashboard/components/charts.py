@@ -6,11 +6,8 @@ All charts use the Bloomberg-inspired dark theme with consistent styling.
 
 from __future__ import annotations
 
-from typing import Any, Optional
-
 import numpy as np
 import pandas as pd
-import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
@@ -235,7 +232,7 @@ def dcf_waterfall_chart(
     measure = ["relative", "relative", "total", "relative", "relative", "total"]
 
     # Colors per bar
-    bar_colors = [
+    [
         COLORS["primary"],
         COLORS["gold"],
         "#2a5a9c",

@@ -3,10 +3,10 @@ LIME (Local Interpretable Model-agnostic Explanations) wrapper.
 """
 
 from __future__ import annotations
-from dataclasses import dataclass, field
-from typing import Any, Optional, List
 
-import numpy as np
+from dataclasses import dataclass, field
+from typing import Any
+
 import pandas as pd
 from loguru import logger
 
@@ -25,10 +25,10 @@ class LIMEResult:
 
     ticker: str
     model_name: str
-    feature_names: List[str]
+    feature_names: list[str]
     lime_importances: dict
     explanation_text: str
-    notes: List[str] = field(default_factory=list)
+    notes: list[str] = field(default_factory=list)
 
 
 class LIMEExplainer:

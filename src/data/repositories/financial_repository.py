@@ -7,8 +7,6 @@ the underlying adapter (yfinance, FMP, etc.) and caching strategy.
 
 from __future__ import annotations
 
-from typing import Optional
-
 from loguru import logger
 
 from configs.settings import settings
@@ -92,7 +90,7 @@ class FinancialRepository:
         self._in_memory_cache.pop(ticker.upper(), None)
         logger.info(f"Cache invalidated for {ticker}")
 
-    def get_current_price(self, ticker: str) -> Optional[float]:
+    def get_current_price(self, ticker: str) -> float | None:
         """Convenience method to get just the current price."""
         try:
             data = self.get_financial_data(ticker)

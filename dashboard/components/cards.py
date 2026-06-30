@@ -5,20 +5,18 @@ Renders HTML via st.markdown with unsafe_allow_html=True.
 
 from __future__ import annotations
 
-from typing import Optional
-
 import streamlit as st
 
-from src.utils.helpers import format_currency, format_percentage
+from src.utils.helpers import format_currency
 
 
 def metric_card(
     label: str,
     value: str,
-    delta: Optional[str] = None,
-    delta_positive: Optional[bool] = None,
+    delta: str | None = None,
+    delta_positive: bool | None = None,
     icon: str = "",
-    subtitle: Optional[str] = None,
+    subtitle: str | None = None,
 ) -> None:
     """Render a styled KPI metric card."""
     delta_color = (
@@ -127,7 +125,7 @@ def info_box(text: str, level: str = "info") -> None:
     )
 
 
-def section_divider(title: str, badge: Optional[str] = None) -> None:
+def section_divider(title: str, badge: str | None = None) -> None:
     """Render a styled section header with optional badge."""
     badge_html = (
         f'<span style="background:rgba(26,108,245,0.15);color:#1a6cf5;'
@@ -160,7 +158,7 @@ def valuation_summary_banner(
 ) -> None:
     """Renders the top-of-page executive banner."""
     upside = (intrinsic_value - current_price) / current_price * 100 if current_price > 0 else 0
-    mos_pct = margin_of_safety * 100
+    margin_of_safety * 100
     rec_color = {
         "STRONG BUY": "#00c851",
         "BUY": "#00c851",

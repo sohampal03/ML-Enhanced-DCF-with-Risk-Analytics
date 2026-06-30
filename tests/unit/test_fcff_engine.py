@@ -2,21 +2,21 @@
 Unit tests for the FCFF Engine.
 """
 
-import pytest
-import pandas as pd
 import sys
 from pathlib import Path
 
+import pandas as pd
+
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from src.finance.engines.fcff_engine import FCFFEngine, FCFFResult
 from src.data.schemas.financial_schemas import (
-    FinancialData,
-    CompanyInfo,
-    AnnualIncomeStatement,
     AnnualBalanceSheet,
     AnnualCashFlowStatement,
+    AnnualIncomeStatement,
+    CompanyInfo,
+    FinancialData,
 )
+from src.finance.engines.fcff_engine import FCFFEngine, FCFFResult
 
 
 def make_sample_data(ticker: str = "TEST") -> FinancialData:
@@ -109,31 +109,31 @@ def make_sample_data(ticker: str = "TEST") -> FinancialData:
 
 
 class TestFCFFEngine:
-    def test_compute_returns_result(self):
+    def test_compute_returns_result(self) -> None:
         data = make_sample_data()
         engine = FCFFEngine()
         result = engine.compute(data)
         assert isinstance(result, FCFFResult)
         assert result.ticker == "TEST"
 
-    def test_fcff_positive_for_profitable_company(self):
+    def test_fcff_positive_for_profitable_company(self) -> None:
         data = make_sample_data()
         result = FCFFEngine().compute(data)
         assert result.latest_fcff is not None
         # A company with 20% EBIT margin and moderate capex should have positive FCFF
         assert result.latest_fcff > 0
 
-    def test_tax_rate_within_bounds(self):
+    def test_tax_rate_within_bounds(self) -> None:
         data = make_sample_data()
         result = FCFFEngine().compute(data)
         assert 0.05 <= result.average_tax_rate <= 0.40
 
-    def test_breakdowns_match_years(self):
+    def test_breakdowns_match_years(self) -> None:
         data = make_sample_data()
         result = FCFFEngine().compute(data)
         assert len(result.breakdowns) == 3
 
-    def test_handles_missing_data(self):
+    def test_handles_missing_data(self) -> None:
         """Test that engine handles incomplete data gracefully."""
         data = FinancialData(
             company_info=CompanyInfo(ticker="EMPTY", name="Empty Co"),
@@ -144,11 +144,11 @@ class TestFCFFEngine:
         result = FCFFEngine().compute(data)
         assert result.latest_fcff is None
 
-    def test_formula_string_present(self):
+    def test_formula_string_present(self) -> None:
         result = FCFFEngine().compute(make_sample_data())
         assert "FCFF" in result.formula
 
-    def test_to_dataframe(self):
+    def test_to_dataframe(self) -> None:
         result = FCFFEngine().compute(make_sample_data())
         df = result.to_dataframe()
         assert isinstance(df, pd.DataFrame)

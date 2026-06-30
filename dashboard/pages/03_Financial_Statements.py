@@ -1,16 +1,17 @@
 """Page 3: Financial Statements Explorer"""
 
 from __future__ import annotations
+
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-import streamlit as st
 import pandas as pd
+import streamlit as st
 
-from dashboard.components.cards import section_divider, info_box
-from dashboard.components.charts import financial_bar_chart, margin_trend_chart, COLORS
+from dashboard.components.cards import info_box, section_divider
+from dashboard.components.charts import COLORS, financial_bar_chart, margin_trend_chart
 from src.utils.helpers import format_currency, format_percentage
 
 st.set_page_config(page_title="Financial Statements | AlphaForge", layout="wide", page_icon="📋")

@@ -3,22 +3,22 @@ Page 2: Company Explorer — Business overview, price history, peer comparison
 """
 
 from __future__ import annotations
+
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-import streamlit as st
 import pandas as pd
+import streamlit as st
 
-from dashboard.components.cards import metric_card, section_divider, info_box
+from dashboard.components.cards import info_box, metric_card, section_divider
 from dashboard.components.charts import (
-    candlestick_chart,
-    peer_radar_chart,
-    financial_bar_chart,
     COLORS,
+    candlestick_chart,
+    financial_bar_chart,
 )
-from src.utils.helpers import format_currency, format_percentage, format_multiple
+from src.utils.helpers import format_currency, format_multiple, format_percentage
 
 st.set_page_config(page_title="Company Explorer | AlphaForge", layout="wide", page_icon="🏢")
 

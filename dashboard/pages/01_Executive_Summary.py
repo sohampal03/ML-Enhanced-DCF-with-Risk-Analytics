@@ -1,6 +1,7 @@
 """Page 1: Executive Summary — full overview after analysis"""
 
 from __future__ import annotations
+
 import sys
 from pathlib import Path
 
@@ -9,15 +10,15 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 import streamlit as st
 
 from dashboard.components.cards import (
+    info_box,
     metric_card,
+    probability_bar,
     recommendation_badge,
     section_divider,
     traffic_light,
     valuation_summary_banner,
-    probability_bar,
-    info_box,
 )
-from dashboard.components.charts import dcf_waterfall_chart, valuation_gauge, COLORS
+from dashboard.components.charts import COLORS, dcf_waterfall_chart, valuation_gauge
 from src.utils.helpers import format_currency, format_percentage
 
 st.set_page_config(page_title="Executive Summary | AlphaForge", layout="wide", page_icon="📊")

@@ -1,16 +1,17 @@
 """Page 7: Explainability Hub — SHAP & natural language explanations"""
 
 from __future__ import annotations
+
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
+import streamlit as st
 
-from dashboard.components.cards import section_divider, info_box
+from dashboard.components.cards import info_box, section_divider
 from dashboard.components.charts import COLORS
 
 st.set_page_config(page_title="Explainability Hub | AlphaForge", layout="wide", page_icon="🔍")
@@ -157,7 +158,7 @@ if rf and rf.feature_importances:
         if fi_items:
             top = fi_items[0]
             st.markdown(
-                f"""
+                """
                 <div style="background:#0f1628;border:1px solid #1e2d4a;border-radius:12px;padding:20px;">
                     <div style="color:#1a6cf5;font-size:13px;font-weight:600;text-transform:uppercase;
                          letter-spacing:1px;margin-bottom:16px;">Why this forecast?</div>

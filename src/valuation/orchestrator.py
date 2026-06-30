@@ -13,16 +13,15 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Optional
 
 from loguru import logger
 
 from src.data.repositories.financial_repository import FinancialRepository
-from src.data.schemas.financial_schemas import FinancialData, ValuationResult
+from src.data.schemas.financial_schemas import FinancialData
 from src.finance.engines.comps_engine import CompsEngine, CompsResult
 from src.finance.engines.dcf_engine import DCFEngine, DCFResult
 from src.finance.engines.fcff_engine import FCFFEngine, FCFFResult
-from src.finance.engines.wacc_engine import WACCEngine, WACCBreakdown
+from src.finance.engines.wacc_engine import WACCBreakdown, WACCEngine
 from src.forecasting.models.revenue_forecaster import (
     ForecastResult,
     MarginForecastingPipeline,
@@ -48,21 +47,21 @@ class FullValuationReport:
     generated_at: datetime = field(default_factory=datetime.utcnow)
 
     # Raw data
-    financial_data: Optional[FinancialData] = None
+    financial_data: FinancialData | None = None
 
     # Financial engines
-    fcff_result: Optional[FCFFResult] = None
-    wacc_result: Optional[WACCBreakdown] = None
-    dcf_result: Optional[DCFResult] = None
-    comps_result: Optional[CompsResult] = None
+    fcff_result: FCFFResult | None = None
+    wacc_result: WACCBreakdown | None = None
+    dcf_result: DCFResult | None = None
+    comps_result: CompsResult | None = None
 
     # ML
-    revenue_forecast: Optional[ForecastResult] = None
-    margin_forecasts: Optional[dict[str, ForecastResult]] = None
-    classification: Optional[ClassificationResult] = None
+    revenue_forecast: ForecastResult | None = None
+    margin_forecasts: dict[str, ForecastResult] | None = None
+    classification: ClassificationResult | None = None
 
     # Risk
-    monte_carlo: Optional[MonteCarloResult] = None
+    monte_carlo: MonteCarloResult | None = None
 
     # Errors
     errors: dict[str, str] = field(default_factory=dict)
@@ -74,11 +73,11 @@ class FullValuationReport:
         return self.dcf_result is not None and self.fcff_result is not None
 
     @property
-    def current_price(self) -> Optional[float]:
+    def current_price(self) -> float | None:
         return self.financial_data.company_info.current_price if self.financial_data else None
 
     @property
-    def intrinsic_value(self) -> Optional[float]:
+    def intrinsic_value(self) -> float | None:
         return self.dcf_result.intrinsic_value_per_share if self.dcf_result else None
 
     @property
@@ -114,11 +113,11 @@ class ValuationOrchestrator:
         run_monte_carlo: bool = True,
         run_comps: bool = True,
         # DCF overrides
-        wacc_override: Optional[float] = None,
-        terminal_growth_rate: Optional[float] = None,
+        wacc_override: float | None = None,
+        terminal_growth_rate: float | None = None,
         forecast_years: int = 10,
-        revenue_growth_override: Optional[float] = None,
-        ebit_margin_override: Optional[float] = None,
+        revenue_growth_override: float | None = None,
+        ebit_margin_override: float | None = None,
     ) -> FullValuationReport:
         """
         Run complete valuation analysis for a ticker.
@@ -157,7 +156,7 @@ class ValuationOrchestrator:
         # ── Step 2: FCFF Engine ───────────────────────────────────────────────
         try:
             report.fcff_result = self.fcff_engine.compute(data)
-            logger.info(f"✓ FCFF computed")
+            logger.info("✓ FCFF computed")
         except Exception as e:
             logger.error(f"FCFF failed: {e}")
             report.errors["fcff"] = str(e)

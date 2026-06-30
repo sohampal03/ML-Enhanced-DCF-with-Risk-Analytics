@@ -10,7 +10,6 @@ Multiples: P/E, EV/EBITDA, EV/Sales, P/B, PEG
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Optional
 
 import numpy as np
 import pandas as pd
@@ -18,7 +17,7 @@ import yfinance as yf
 from loguru import logger
 
 from src.data.schemas.financial_schemas import FinancialData
-from src.utils.helpers import format_multiple, safe_divide
+from src.utils.helpers import format_multiple
 
 # Sector → Peer tickers mapping (curated list)
 SECTOR_PEERS: dict[str, list[str]] = {
@@ -42,16 +41,16 @@ class CompanyMultiples:
 
     ticker: str
     name: str
-    pe_ratio: Optional[float]
-    forward_pe: Optional[float]
-    ev_ebitda: Optional[float]
-    ev_sales: Optional[float]
-    pb_ratio: Optional[float]
-    peg_ratio: Optional[float]
-    market_cap: Optional[float]
-    revenue_growth: Optional[float]
-    profit_margin: Optional[float]
-    roe: Optional[float]
+    pe_ratio: float | None
+    forward_pe: float | None
+    ev_ebitda: float | None
+    ev_sales: float | None
+    pb_ratio: float | None
+    peg_ratio: float | None
+    market_cap: float | None
+    revenue_growth: float | None
+    profit_margin: float | None
+    roe: float | None
     is_target: bool = False
 
     def to_dict(self) -> dict:
@@ -76,15 +75,15 @@ class CompsResult:
     """Comparable companies analysis output."""
 
     target_ticker: str
-    sector: Optional[str]
-    industry: Optional[str]
+    sector: str | None
+    industry: str | None
     company_multiples: list[CompanyMultiples] = field(default_factory=list)
-    peer_median_pe: Optional[float] = None
-    peer_median_ev_ebitda: Optional[float] = None
-    peer_median_ev_sales: Optional[float] = None
+    peer_median_pe: float | None = None
+    peer_median_ev_ebitda: float | None = None
+    peer_median_ev_sales: float | None = None
     implied_values: dict = field(default_factory=dict)
-    attractiveness_rank: Optional[int] = None
-    attractiveness_score: Optional[float] = None  # 0–10
+    attractiveness_rank: int | None = None
+    attractiveness_score: float | None = None  # 0–10
     notes: list[str] = field(default_factory=list)
 
     def to_dataframe(self) -> pd.DataFrame:
@@ -93,7 +92,7 @@ class CompsResult:
         return pd.DataFrame(rows)
 
     @property
-    def target_multiples(self) -> Optional[CompanyMultiples]:
+    def target_multiples(self) -> CompanyMultiples | None:
         for m in self.company_multiples:
             if m.is_target:
                 return m
@@ -181,7 +180,7 @@ class CompsEngine:
         )
         return result
 
-    def _get_peers(self, target_ticker: str, sector: Optional[str]) -> list[str]:
+    def _get_peers(self, target_ticker: str, sector: str | None) -> list[str]:
         """Get sector peers, excluding the target company."""
         if sector and sector in SECTOR_PEERS:
             peers = [t for t in SECTOR_PEERS[sector] if t.upper() != target_ticker.upper()]
@@ -193,7 +192,7 @@ class CompsEngine:
     def _build_multiples(self, ticker: str, info: dict, is_target: bool) -> CompanyMultiples:
         """Build CompanyMultiples from raw info dict."""
 
-        def safe_get(key: str) -> Optional[float]:
+        def safe_get(key: str) -> float | None:
             val = info.get(key)
             if val is None or (isinstance(val, float) and (np.isnan(val) or np.isinf(val))):
                 return None
@@ -215,7 +214,7 @@ class CompsEngine:
             is_target=is_target,
         )
 
-    def _median_multiple(self, values: list[Optional[float]]) -> Optional[float]:
+    def _median_multiple(self, values: list[float | None]) -> float | None:
         """Compute median of a list, ignoring None and extremes."""
         clean = [v for v in values if v is not None and 0 < v < 200]
         return float(np.median(clean)) if clean else None
@@ -223,9 +222,9 @@ class CompsEngine:
     def _compute_implied_values(
         self,
         data: FinancialData,
-        median_pe: Optional[float],
-        median_ev_ebitda: Optional[float],
-        median_ev_sales: Optional[float],
+        median_pe: float | None,
+        median_ev_ebitda: float | None,
+        median_ev_sales: float | None,
     ) -> dict:
         """Compute implied share price from peer median multiples."""
         result = {}
@@ -261,7 +260,7 @@ class CompsEngine:
             return score, 1
 
         peer_pe = self._median_multiple([m.pe_ratio for m in peers])
-        peer_ev = self._median_multiple([m.ev_ebitda for m in peers])
+        self._median_multiple([m.ev_ebitda for m in peers])
 
         # Lower PE = better value (if positive)
         if peer_pe and target.pe_ratio and target.pe_ratio > 0:
@@ -287,7 +286,7 @@ class CompsEngine:
         score = max(0.0, min(10.0, score))
 
         # Rank (1 = most attractive)
-        all_scores = [5.0] * len(peers)  # Simplified — target vs neutral peers
+        [5.0] * len(peers)  # Simplified — target vs neutral peers
         rank = 1  # Simplified ranking
 
         return score, rank
@@ -296,7 +295,7 @@ class CompsEngine:
         self,
         target: CompanyMultiples,
         peers: list[CompanyMultiples],
-        median_pe: Optional[float],
+        median_pe: float | None,
     ) -> list[str]:
         """Generate analyst commentary."""
         notes = []

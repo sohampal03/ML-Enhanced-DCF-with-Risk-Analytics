@@ -8,8 +8,6 @@ Handles US tickers (AAPL, MSFT) and international tickers (INFY.NS, RELIANCE.NS)
 from __future__ import annotations
 
 import time
-from datetime import datetime, timezone
-from typing import Optional
 
 import numpy as np
 import pandas as pd
@@ -426,7 +424,7 @@ class YFinanceAdapter:
         return results
 
     @disk_cache(ttl_seconds=900)
-    def _fetch_price_history(self, ticker: str, years: int = 10) -> Optional[pd.DataFrame]:
+    def _fetch_price_history(self, ticker: str, years: int = 10) -> pd.DataFrame | None:
         """Fetch historical OHLCV price data."""
         try:
             period = f"{min(years, 10)}y"
@@ -445,7 +443,7 @@ class YFinanceAdapter:
     # ── Helper methods ────────────────────────────────────────────────────────
 
     @staticmethod
-    def _get_value(row: pd.Series, keys: list[str]) -> Optional[float]:
+    def _get_value(row: pd.Series, keys: list[str]) -> float | None:
         """Try multiple column name variants, return first found."""
         for key in keys:
             if key in row.index and not pd.isna(row[key]):
@@ -454,7 +452,7 @@ class YFinanceAdapter:
         return None
 
     @staticmethod
-    def _safe_float(value: object) -> Optional[float]:
+    def _safe_float(value: object) -> float | None:
         try:
             f = float(value)  # type: ignore
             return None if np.isnan(f) or np.isinf(f) else f
@@ -462,19 +460,19 @@ class YFinanceAdapter:
             return None
 
     @staticmethod
-    def _margin(numerator: Optional[float], denominator: Optional[float]) -> Optional[float]:
+    def _margin(numerator: float | None, denominator: float | None) -> float | None:
         if numerator is None or denominator is None or denominator == 0:
             return None
         return numerator / denominator
 
     @staticmethod
-    def _subtract(a: Optional[float], b: Optional[float]) -> Optional[float]:
+    def _subtract(a: float | None, b: float | None) -> float | None:
         if a is None or b is None:
             return None
         return a - b
 
     @staticmethod
-    def _add(a: Optional[float], b: Optional[float]) -> Optional[float]:
+    def _add(a: float | None, b: float | None) -> float | None:
         if a is None and b is None:
             return None
         return (a or 0) + (b or 0)

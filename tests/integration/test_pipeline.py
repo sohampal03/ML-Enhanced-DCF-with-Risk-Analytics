@@ -3,13 +3,12 @@ Integration test: full valuation pipeline end-to-end.
 Uses synthetic data to avoid network calls.
 """
 
-import pytest
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from src.valuation.orchestrator import ValuationOrchestrator, FullValuationReport
+from src.valuation.orchestrator import FullValuationReport, ValuationOrchestrator
 from tests.unit.test_fcff_engine import make_sample_data
 
 
@@ -28,7 +27,7 @@ class TestFullPipeline:
         orch.repository = MockRepository()
         return orch
 
-    def test_full_pipeline_completes(self):
+    def test_full_pipeline_completes(self) -> None:
         orch = self._make_orchestrator_with_mock()
         report = orch.analyze("TEST", run_ml=False, run_monte_carlo=False, run_comps=False)
         assert report.is_complete
@@ -36,13 +35,13 @@ class TestFullPipeline:
         assert report.fcff_result is not None
         assert report.wacc_result is not None
 
-    def test_pipeline_with_ml(self):
+    def test_pipeline_with_ml(self) -> None:
         orch = self._make_orchestrator_with_mock()
         report = orch.analyze("TEST", run_ml=True, run_monte_carlo=False, run_comps=False)
         # ML may fail with synthetic data but pipeline should not crash
         assert isinstance(report, FullValuationReport)
 
-    def test_pipeline_with_monte_carlo(self):
+    def test_pipeline_with_monte_carlo(self) -> None:
         orch = self._make_orchestrator_with_mock()
         report = orch.analyze("TEST", run_ml=False, run_monte_carlo=True, run_comps=False)
         if report.monte_carlo:
@@ -52,7 +51,7 @@ class TestFullPipeline:
             assert 0 <= mc.prob_overvalued <= 1
             assert abs(mc.prob_undervalued + mc.prob_in_range + mc.prob_overvalued - 1.0) < 0.1
 
-    def test_wacc_override_propagates(self):
+    def test_wacc_override_propagates(self) -> None:
         orch = self._make_orchestrator_with_mock()
         r1 = orch.analyze(
             "TEST", wacc_override=0.06, run_ml=False, run_monte_carlo=False, run_comps=False
@@ -63,7 +62,7 @@ class TestFullPipeline:
         if r1.dcf_result and r2.dcf_result:
             assert r1.dcf_result.intrinsic_value_per_share > r2.dcf_result.intrinsic_value_per_share
 
-    def test_errors_do_not_crash_pipeline(self):
+    def test_errors_do_not_crash_pipeline(self) -> None:
         """Pipeline should handle individual module errors gracefully."""
         orch = self._make_orchestrator_with_mock()
         # Even with all modules running, should not raise
@@ -72,7 +71,7 @@ class TestFullPipeline:
         # Core should succeed
         assert report.dcf_result is not None
 
-    def test_recommendation_consistency(self):
+    def test_recommendation_consistency(self) -> None:
         orch = self._make_orchestrator_with_mock()
         report = orch.analyze("TEST", run_ml=False, run_monte_carlo=False, run_comps=False)
         if report.dcf_result:

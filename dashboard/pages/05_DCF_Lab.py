@@ -20,17 +20,13 @@ from dashboard.components.cards import (
     metric_card,
     recommendation_badge,
     section_divider,
-    valuation_summary_banner,
 )
 from dashboard.components.charts import (
     dcf_waterfall_chart,
     sensitivity_heatmap,
-    revenue_forecast_chart,
-    COLORS,
 )
 from src.finance.engines.dcf_engine import DCFEngine
 from src.utils.helpers import format_currency, format_percentage
-import plotly.graph_objects as go
 
 st.set_page_config(page_title="DCF Lab | AlphaForge", layout="wide", page_icon="🔬")
 
@@ -75,25 +71,25 @@ with st.expander("📚 How DCF Works — Formula & Theory", expanded=False):
     with c1:
         st.markdown("""
         **Discounted Cash Flow (DCF) Formula:**
-        
+
         ```
         Enterprise Value = Σ [FCFF_t / (1+WACC)^t] + TV / (1+WACC)^n
-        
+
         Where:
           FCFF = EBIT × (1-Tax) + D&A − ΔNWC − CAPEX
           TV   = FCFF_n × (1+g) / (WACC − g)       [Gordon Growth]
           WACC = (E/V)×Ke + (D/V)×Kd×(1-T)
           Ke   = Rf + β × (Rm − Rf)                 [CAPM]
         ```
-        
+
         **Equity Value = Enterprise Value − Debt + Cash**
-        
+
         **Intrinsic Value / Share = Equity Value / Shares Outstanding**
         """)
     with c2:
         st.markdown("""
         **Key Assumptions & Their Impact:**
-        
+
         | Assumption | ↑ Increases | ↓ Decreases |
         |---|---|---|
         | Revenue Growth | Intrinsic Value | — |
@@ -101,7 +97,7 @@ with st.expander("📚 How DCF Works — Formula & Theory", expanded=False):
         | Terminal Growth | Intrinsic Value | — |
         | EBIT Margin | Intrinsic Value | — |
         | CAPEX % | — | Intrinsic Value |
-        
+
         > **Rule of thumb:** A 1% change in WACC typically changes intrinsic value by 10–20%.
         > Terminal value often represents 60–80% of total value in high-growth companies.
         """)

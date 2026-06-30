@@ -20,7 +20,6 @@ Output:
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Optional
 
 import numpy as np
 import pandas as pd
@@ -37,10 +36,10 @@ class MonteCarloAssumption:
     base: float
     std: float  # Standard deviation
     distribution: str = "normal"  # 'normal', 'lognormal', 'triangular'
-    low: Optional[float] = None  # For triangular
-    high: Optional[float] = None  # For triangular
-    clip_min: Optional[float] = None
-    clip_max: Optional[float] = None
+    low: float | None = None  # For triangular
+    high: float | None = None  # For triangular
+    clip_min: float | None = None
+    clip_max: float | None = None
 
     def sample(self, n: int, rng: np.random.Generator) -> np.ndarray:
         """Draw n samples from this parameter's distribution."""
@@ -150,7 +149,7 @@ class MonteCarloSimulator:
         self,
         dcf_result: DCFResult,
         data: object,  # FinancialData
-        custom_assumptions: Optional[dict] = None,
+        custom_assumptions: dict | None = None,
     ) -> MonteCarloResult:
         """
         Run Monte Carlo simulation.

@@ -19,7 +19,6 @@ Where:
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Optional
 
 from loguru import logger
 
@@ -107,10 +106,10 @@ class WACCEngine:
     def compute(
         self,
         data: FinancialData,
-        risk_free_rate: Optional[float] = None,
-        market_risk_premium: Optional[float] = None,
-        tax_rate_override: Optional[float] = None,
-        beta_override: Optional[float] = None,
+        risk_free_rate: float | None = None,
+        market_risk_premium: float | None = None,
+        tax_rate_override: float | None = None,
+        beta_override: float | None = None,
     ) -> WACCBreakdown:
         """
         Compute WACC for a company.

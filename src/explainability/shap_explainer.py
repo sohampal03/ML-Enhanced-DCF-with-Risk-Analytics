@@ -8,7 +8,7 @@ natural-language explanations.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, Optional
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -30,8 +30,8 @@ class SHAPResult:
     ticker: str
     model_name: str
     feature_names: list[str]
-    shap_values: Optional[np.ndarray]  # shape: (n_samples, n_features)
-    base_value: Optional[float]  # Model's expected value
+    shap_values: np.ndarray | None  # shape: (n_samples, n_features)
+    base_value: float | None  # Model's expected value
     feature_importances: dict[str, float]  # Global mean |SHAP|
     top_positive_drivers: list[dict]  # Features increasing value
     top_negative_drivers: list[dict]  # Features decreasing value
@@ -67,7 +67,7 @@ class SHAPExplainer:
         self,
         model: Any,
         X_train: pd.DataFrame,
-        X_explain: Optional[pd.DataFrame] = None,
+        X_explain: pd.DataFrame | None = None,
         model_name: str = "ML Model",
         ticker: str = "TICKER",
         target: str = "revenue",

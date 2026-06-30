@@ -8,7 +8,6 @@ All data source adapters must normalize their output to these schemas.
 from __future__ import annotations
 
 from datetime import date, datetime
-from typing import Optional
 
 import pandas as pd
 from pydantic import BaseModel, Field, field_validator
@@ -19,30 +18,30 @@ class CompanyInfo(BaseModel):
 
     ticker: str
     name: str
-    description: Optional[str] = None
-    sector: Optional[str] = None
-    industry: Optional[str] = None
-    country: Optional[str] = None
+    description: str | None = None
+    sector: str | None = None
+    industry: str | None = None
+    country: str | None = None
     currency: str = "USD"
-    exchange: Optional[str] = None
-    website: Optional[str] = None
-    employees: Optional[int] = None
+    exchange: str | None = None
+    website: str | None = None
+    employees: int | None = None
 
     # Market data
-    current_price: Optional[float] = None
-    market_cap: Optional[float] = None
-    shares_outstanding: Optional[float] = None
-    beta: Optional[float] = None
-    dividend_yield: Optional[float] = None
-    pe_ratio: Optional[float] = None
-    forward_pe: Optional[float] = None
-    pb_ratio: Optional[float] = None
-    ev_ebitda: Optional[float] = None
-    debt_to_equity: Optional[float] = None
-    return_on_equity: Optional[float] = None
-    return_on_assets: Optional[float] = None
-    profit_margin: Optional[float] = None
-    revenue_growth: Optional[float] = None
+    current_price: float | None = None
+    market_cap: float | None = None
+    shares_outstanding: float | None = None
+    beta: float | None = None
+    dividend_yield: float | None = None
+    pe_ratio: float | None = None
+    forward_pe: float | None = None
+    pb_ratio: float | None = None
+    ev_ebitda: float | None = None
+    debt_to_equity: float | None = None
+    return_on_equity: float | None = None
+    return_on_assets: float | None = None
+    profit_margin: float | None = None
+    revenue_growth: float | None = None
 
     # Fetched at
     fetched_at: datetime = Field(default_factory=datetime.utcnow)
@@ -58,35 +57,35 @@ class AnnualIncomeStatement(BaseModel):
 
     ticker: str
     fiscal_year: int
-    fiscal_year_end: Optional[date] = None
+    fiscal_year_end: date | None = None
 
     # Revenue
-    revenue: Optional[float] = None
-    cost_of_revenue: Optional[float] = None
-    gross_profit: Optional[float] = None
+    revenue: float | None = None
+    cost_of_revenue: float | None = None
+    gross_profit: float | None = None
 
     # Operating
-    research_and_development: Optional[float] = None
-    selling_general_administrative: Optional[float] = None
-    operating_expenses: Optional[float] = None
-    ebitda: Optional[float] = None
-    depreciation_amortization: Optional[float] = None
-    ebit: Optional[float] = None
+    research_and_development: float | None = None
+    selling_general_administrative: float | None = None
+    operating_expenses: float | None = None
+    ebitda: float | None = None
+    depreciation_amortization: float | None = None
+    ebit: float | None = None
 
     # Below the line
-    interest_expense: Optional[float] = None
-    other_income: Optional[float] = None
-    pretax_income: Optional[float] = None
-    income_tax: Optional[float] = None
-    net_income: Optional[float] = None
+    interest_expense: float | None = None
+    other_income: float | None = None
+    pretax_income: float | None = None
+    income_tax: float | None = None
+    net_income: float | None = None
 
     # Derived
-    gross_margin: Optional[float] = None
-    ebit_margin: Optional[float] = None
-    net_margin: Optional[float] = None
-    effective_tax_rate: Optional[float] = None
-    eps_diluted: Optional[float] = None
-    shares_diluted: Optional[float] = None
+    gross_margin: float | None = None
+    ebit_margin: float | None = None
+    net_margin: float | None = None
+    effective_tax_rate: float | None = None
+    eps_diluted: float | None = None
+    shares_diluted: float | None = None
 
 
 class AnnualBalanceSheet(BaseModel):
@@ -94,33 +93,33 @@ class AnnualBalanceSheet(BaseModel):
 
     ticker: str
     fiscal_year: int
-    fiscal_year_end: Optional[date] = None
+    fiscal_year_end: date | None = None
 
     # Assets
-    cash_and_equivalents: Optional[float] = None
-    short_term_investments: Optional[float] = None
-    accounts_receivable: Optional[float] = None
-    inventory: Optional[float] = None
-    total_current_assets: Optional[float] = None
-    property_plant_equipment: Optional[float] = None
-    goodwill: Optional[float] = None
-    intangible_assets: Optional[float] = None
-    total_assets: Optional[float] = None
+    cash_and_equivalents: float | None = None
+    short_term_investments: float | None = None
+    accounts_receivable: float | None = None
+    inventory: float | None = None
+    total_current_assets: float | None = None
+    property_plant_equipment: float | None = None
+    goodwill: float | None = None
+    intangible_assets: float | None = None
+    total_assets: float | None = None
 
     # Liabilities
-    accounts_payable: Optional[float] = None
-    short_term_debt: Optional[float] = None
-    total_current_liabilities: Optional[float] = None
-    long_term_debt: Optional[float] = None
-    total_debt: Optional[float] = None
-    total_liabilities: Optional[float] = None
+    accounts_payable: float | None = None
+    short_term_debt: float | None = None
+    total_current_liabilities: float | None = None
+    long_term_debt: float | None = None
+    total_debt: float | None = None
+    total_liabilities: float | None = None
 
     # Equity
-    total_equity: Optional[float] = None
-    retained_earnings: Optional[float] = None
+    total_equity: float | None = None
+    retained_earnings: float | None = None
 
     # Net Working Capital
-    net_working_capital: Optional[float] = None
+    net_working_capital: float | None = None
 
 
 class AnnualCashFlowStatement(BaseModel):
@@ -128,28 +127,28 @@ class AnnualCashFlowStatement(BaseModel):
 
     ticker: str
     fiscal_year: int
-    fiscal_year_end: Optional[date] = None
+    fiscal_year_end: date | None = None
 
     # Operating
-    net_income: Optional[float] = None
-    depreciation_amortization: Optional[float] = None
-    stock_based_compensation: Optional[float] = None
-    change_in_working_capital: Optional[float] = None
-    operating_cash_flow: Optional[float] = None
+    net_income: float | None = None
+    depreciation_amortization: float | None = None
+    stock_based_compensation: float | None = None
+    change_in_working_capital: float | None = None
+    operating_cash_flow: float | None = None
 
     # Investing
-    capital_expenditures: Optional[float] = None
-    acquisitions: Optional[float] = None
-    investing_cash_flow: Optional[float] = None
+    capital_expenditures: float | None = None
+    acquisitions: float | None = None
+    investing_cash_flow: float | None = None
 
     # Financing
-    debt_repayment: Optional[float] = None
-    dividends_paid: Optional[float] = None
-    share_repurchases: Optional[float] = None
-    financing_cash_flow: Optional[float] = None
+    debt_repayment: float | None = None
+    dividends_paid: float | None = None
+    share_repurchases: float | None = None
+    financing_cash_flow: float | None = None
 
     # Free Cash Flow
-    free_cash_flow: Optional[float] = None
+    free_cash_flow: float | None = None
 
 
 class FinancialData(BaseModel):
@@ -159,22 +158,22 @@ class FinancialData(BaseModel):
     income_statements: list[AnnualIncomeStatement] = Field(default_factory=list)
     balance_sheets: list[AnnualBalanceSheet] = Field(default_factory=list)
     cash_flow_statements: list[AnnualCashFlowStatement] = Field(default_factory=list)
-    price_history: Optional[dict] = None  # Serialized DataFrame
+    price_history: dict | None = None  # Serialized DataFrame
 
     @property
     def ticker(self) -> str:
         return self.company_info.ticker
 
     @property
-    def latest_income(self) -> Optional[AnnualIncomeStatement]:
+    def latest_income(self) -> AnnualIncomeStatement | None:
         return self.income_statements[0] if self.income_statements else None
 
     @property
-    def latest_balance(self) -> Optional[AnnualBalanceSheet]:
+    def latest_balance(self) -> AnnualBalanceSheet | None:
         return self.balance_sheets[0] if self.balance_sheets else None
 
     @property
-    def latest_cash_flow(self) -> Optional[AnnualCashFlowStatement]:
+    def latest_cash_flow(self) -> AnnualCashFlowStatement | None:
         return self.cash_flow_statements[0] if self.cash_flow_statements else None
 
     def income_df(self) -> pd.DataFrame:

@@ -304,7 +304,7 @@ elif st.session_state.report and st.session_state.report.is_complete:
         traffic_light,
         valuation_summary_banner,
     )
-    from dashboard.components.charts import dcf_waterfall_chart, valuation_gauge
+    from dashboard.components.charts import dcf_waterfall_chart
     from src.utils.helpers import format_currency, format_percentage
 
     dcf = report.dcf_result

@@ -1,17 +1,18 @@
 """Page 9: Report Generator — Export PDF/HTML institutional reports"""
 
 from __future__ import annotations
+
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-import io
 import datetime
-import streamlit as st
-import pandas as pd
 
-from dashboard.components.cards import section_divider, info_box, metric_card
+import pandas as pd
+import streamlit as st
+
+from dashboard.components.cards import section_divider
 from src.utils.helpers import format_currency, format_percentage
 
 st.set_page_config(page_title="Report Generator | AlphaForge", layout="wide", page_icon="📄")
@@ -32,7 +33,6 @@ info = report.financial_data.company_info if report.financial_data else None
 def generate_html_report(report) -> str:
     """Generate a complete HTML investment report."""
     dcf = report.dcf_result
-    mc = report.monte_carlo
     info = report.financial_data.company_info if report.financial_data else None
     ts = datetime.datetime.now().strftime("%B %d, %Y")
 
@@ -114,9 +114,9 @@ def generate_html_report(report) -> str:
       <div class="kpi-value" style="color:{rec_color};">{dcf.recommendation if dcf else 'N/A'}</div>
     </div>
   </div>
-  
+
   <div class="rec-badge">{dcf.recommendation if dcf else 'N/A'}</div>
-  
+
   {'<div class="highlight">Monte Carlo: ' + f'{report.monte_carlo.n_simulations:,} simulations → P(Undervalued) = {report.monte_carlo.prob_undervalued:.1%}</div>' if report.monte_carlo else ''}
 </div>
 
@@ -127,7 +127,7 @@ def generate_html_report(report) -> str:
   </table>''' if dcf else [''])}
 </div>
 
-{'<div class="section"><div class="section-title">Year-by-Year Projections</div>' + 
+{'<div class="section"><div class="section-title">Year-by-Year Projections</div>' +
   '<table><tr>' + ''.join(f"<th>{k}</th>" for k in ["Year","Revenue","EBIT","FCFF","Discount Factor","PV FCFF"]) + '</tr>' +
   ''.join('<tr>' + ''.join(f'<td>{p.to_dict().get(k, "")}</td>' for k in ["Year","projected_revenue","ebit","fcff","discount_factor","pv_fcff"]) + '</tr>' for p in dcf.projections) +
   '</table></div>' if dcf else ''}

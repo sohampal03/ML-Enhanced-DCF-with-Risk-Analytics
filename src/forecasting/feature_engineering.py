@@ -7,8 +7,6 @@ with engineered ratios, growth rates, lags, and rolling statistics.
 
 from __future__ import annotations
 
-from typing import Optional
-
 import numpy as np
 import pandas as pd
 from loguru import logger
@@ -33,7 +31,7 @@ class FeatureEngineer:
 
     def __init__(self, scale: bool = True) -> None:
         self.scale = scale
-        self._scaler: Optional[StandardScaler] = None
+        self._scaler: StandardScaler | None = None
 
     def build_features(self, data: FinancialData) -> pd.DataFrame:
         """
