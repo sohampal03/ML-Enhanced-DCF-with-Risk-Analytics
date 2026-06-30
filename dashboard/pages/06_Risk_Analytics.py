@@ -50,16 +50,23 @@ st.markdown(
 )
 
 if not mc:
-    info_box("Monte Carlo simulation was not run or failed. Re-run analysis with Monte Carlo enabled.", "warning")
+    info_box(
+        "Monte Carlo simulation was not run or failed. Re-run analysis with Monte Carlo enabled.",
+        "warning",
+    )
     if dcf:
         st.markdown("### Base DCF Scenario Analysis")
         col1, col2, col3 = st.columns(3)
         with col1:
-            metric_card("Bear Case (−30%)", format_currency(dcf.intrinsic_value_per_share * 0.70), icon="🐻")
+            metric_card(
+                "Bear Case (−30%)", format_currency(dcf.intrinsic_value_per_share * 0.70), icon="🐻"
+            )
         with col2:
             metric_card("Base Case", format_currency(dcf.intrinsic_value_per_share), icon="📊")
         with col3:
-            metric_card("Bull Case (+30%)", format_currency(dcf.intrinsic_value_per_share * 1.30), icon="🐂")
+            metric_card(
+                "Bull Case (+30%)", format_currency(dcf.intrinsic_value_per_share * 1.30), icon="🐂"
+            )
     st.stop()
 
 current_price = mc.current_price
@@ -75,11 +82,9 @@ with c2:
 with c3:
     metric_card("Std Deviation", format_currency(mc.std_value), icon="📉")
 with c4:
-    metric_card("Skewness", f"{mc.skewness:.2f}", icon="📐",
-                subtitle="Positive = right tail")
+    metric_card("Skewness", f"{mc.skewness:.2f}", icon="📐", subtitle="Positive = right tail")
 with c5:
-    metric_card("Kurtosis", f"{mc.kurtosis:.2f}", icon="📏",
-                subtitle="Fat tails > 3")
+    metric_card("Kurtosis", f"{mc.kurtosis:.2f}", icon="📏", subtitle="Fat tails > 3")
 
 st.markdown("<br>", unsafe_allow_html=True)
 
@@ -173,28 +178,39 @@ if report.revenue_forecast:
     fig_fan = go.Figure()
 
     # Historical
-    fig_fan.add_trace(go.Scatter(
-        x=rf.historical_years, y=hist_vals,
-        name="Historical", line=dict(color=COLORS["primary"], width=2.5),
-    ))
+    fig_fan.add_trace(
+        go.Scatter(
+            x=rf.historical_years,
+            y=hist_vals,
+            name="Historical",
+            line=dict(color=COLORS["primary"], width=2.5),
+        )
+    )
 
     # Fan bands at different CIs
     for alpha, label in [(0.15, "70% CI"), (0.05, "90% CI")]:
         spread = [(u - l) * alpha for u, l in zip(upper, lower)]
-        fig_fan.add_trace(go.Scatter(
-            x=rf.forecast_years + rf.forecast_years[::-1],
-            y=[(f + s) for f, s in zip(forecast_vals, spread)] + [(f - s) for f, s in zip(forecast_vals, spread)][::-1],
-            fill="toself",
-            fillcolor=f"rgba(26,108,245,{0.08 if alpha == 0.15 else 0.15})",
-            line=dict(color="rgba(0,0,0,0)"),
-            name=label,
-        ))
+        fig_fan.add_trace(
+            go.Scatter(
+                x=rf.forecast_years + rf.forecast_years[::-1],
+                y=[(f + s) for f, s in zip(forecast_vals, spread)]
+                + [(f - s) for f, s in zip(forecast_vals, spread)][::-1],
+                fill="toself",
+                fillcolor=f"rgba(26,108,245,{0.08 if alpha == 0.15 else 0.15})",
+                line=dict(color="rgba(0,0,0,0)"),
+                name=label,
+            )
+        )
 
     # Central forecast
-    fig_fan.add_trace(go.Scatter(
-        x=rf.forecast_years, y=forecast_vals,
-        name="Forecast", line=dict(color=COLORS["gold"], width=2, dash="dash"),
-    ))
+    fig_fan.add_trace(
+        go.Scatter(
+            x=rf.forecast_years,
+            y=forecast_vals,
+            name="Forecast",
+            line=dict(color=COLORS["gold"], width=2, dash="dash"),
+        )
+    )
 
     fig_fan.update_layout(
         template="plotly_dark",

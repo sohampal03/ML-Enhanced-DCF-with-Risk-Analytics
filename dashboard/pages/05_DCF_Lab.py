@@ -73,7 +73,8 @@ st.markdown(
 with st.expander("📚 How DCF Works — Formula & Theory", expanded=False):
     c1, c2 = st.columns(2)
     with c1:
-        st.markdown("""
+        st.markdown(
+            """
         **Discounted Cash Flow (DCF) Formula:**
         
         ```
@@ -89,9 +90,11 @@ with st.expander("📚 How DCF Works — Formula & Theory", expanded=False):
         **Equity Value = Enterprise Value − Debt + Cash**
         
         **Intrinsic Value / Share = Equity Value / Shares Outstanding**
-        """)
+        """
+        )
     with c2:
-        st.markdown("""
+        st.markdown(
+            """
         **Key Assumptions & Their Impact:**
         
         | Assumption | ↑ Increases | ↓ Decreases |
@@ -104,7 +107,8 @@ with st.expander("📚 How DCF Works — Formula & Theory", expanded=False):
         
         > **Rule of thumb:** A 1% change in WACC typically changes intrinsic value by 10–20%.
         > Terminal value often represents 60–80% of total value in high-growth companies.
-        """)
+        """
+        )
 
 st.markdown("---")
 
@@ -119,23 +123,48 @@ with col_sliders:
     )
 
     st.markdown("**Revenue Growth**")
-    rev_growth_y1 = st.slider("Year 1 Growth (%)", -20, 60, int((dcf.revenue_growth_rates[0] if dcf.revenue_growth_rates else 0.08) * 100), key="rev_y1") / 100
-    rev_growth_terminal = st.slider("Terminal Growth Rate (%)", 1, 6, int(dcf.terminal_growth_rate * 100), key="rev_terminal") / 100
+    rev_growth_y1 = (
+        st.slider(
+            "Year 1 Growth (%)",
+            -20,
+            60,
+            int((dcf.revenue_growth_rates[0] if dcf.revenue_growth_rates else 0.08) * 100),
+            key="rev_y1",
+        )
+        / 100
+    )
+    rev_growth_terminal = (
+        st.slider(
+            "Terminal Growth Rate (%)",
+            1,
+            6,
+            int(dcf.terminal_growth_rate * 100),
+            key="rev_terminal",
+        )
+        / 100
+    )
 
     st.markdown("**Margins & Costs**")
-    ebit_margin = st.slider("EBIT Margin (%)", 1, 60, int(dcf.ebit_margin_forecast * 100), key="ebit_margin") / 100
+    ebit_margin = (
+        st.slider("EBIT Margin (%)", 1, 60, int(dcf.ebit_margin_forecast * 100), key="ebit_margin")
+        / 100
+    )
     tax_rate = st.slider("Tax Rate (%)", 5, 40, int(dcf.tax_rate * 100), key="tax_rate") / 100
     capex_pct = st.slider("CAPEX (% of Revenue)", 1, 30, 5, key="capex_pct") / 100
     da_pct = st.slider("D&A (% of Revenue)", 1, 20, 4, key="da_pct") / 100
 
     st.markdown("**Discount Rate**")
-    wacc_val = st.slider(
-        "WACC (%)",
-        4.0, 25.0,
-        float(round(dcf.wacc * 100, 1)),
-        step=0.1,
-        key="wacc_slider",
-    ) / 100
+    wacc_val = (
+        st.slider(
+            "WACC (%)",
+            4.0,
+            25.0,
+            float(round(dcf.wacc * 100, 1)),
+            step=0.1,
+            key="wacc_slider",
+        )
+        / 100
+    )
 
     st.markdown("**Forecast Period**")
     n_years = st.slider("Forecast Years", 5, 15, dcf.forecast_years, key="n_years")
@@ -176,7 +205,9 @@ with col_results:
     # KPI Row
     k1, k2, k3, k4 = st.columns(4)
     with k1:
-        metric_card("Intrinsic Value", format_currency(live_dcf.intrinsic_value_per_share), icon="💎")
+        metric_card(
+            "Intrinsic Value", format_currency(live_dcf.intrinsic_value_per_share), icon="💎"
+        )
     with k2:
         metric_card("Market Price", format_currency(live_dcf.current_price), icon="📈")
     with k3:
@@ -227,10 +258,14 @@ for col in ["Revenue", "EBIT", "NOPAT", "D&A", "CAPEX", "ΔNWC", "FCFF", "PV of 
 # Format percentage columns
 for col in ["Revenue Growth", "EBIT Margin"]:
     if col in proj_df.columns:
-        proj_df[col] = proj_df[col].apply(lambda x: format_percentage(x) if isinstance(x, float) else x)
+        proj_df[col] = proj_df[col].apply(
+            lambda x: format_percentage(x) if isinstance(x, float) else x
+        )
 # Format discount factor
 if "Discount Factor" in proj_df.columns:
-    proj_df["Discount Factor"] = proj_df["Discount Factor"].apply(lambda x: f"{x:.4f}" if isinstance(x, float) else x)
+    proj_df["Discount Factor"] = proj_df["Discount Factor"].apply(
+        lambda x: f"{x:.4f}" if isinstance(x, float) else x
+    )
 
 st.dataframe(
     proj_df,

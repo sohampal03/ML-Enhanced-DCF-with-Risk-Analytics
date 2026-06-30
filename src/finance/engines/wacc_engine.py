@@ -37,18 +37,18 @@ class WACCBreakdown:
     risk_free_rate: float
     market_risk_premium: float
     tax_rate: float
-    market_equity: float      # Market cap
+    market_equity: float  # Market cap
     total_debt: float
 
     # CAPM
-    cost_of_equity: float    # Ke = Rf + β × (Rm - Rf)
+    cost_of_equity: float  # Ke = Rf + β × (Rm - Rf)
     cost_of_debt_pretax: float
-    cost_of_debt_after_tax: float   # Kd × (1 - Tax)
+    cost_of_debt_after_tax: float  # Kd × (1 - Tax)
 
     # Weights
-    equity_weight: float     # E / V
-    debt_weight: float       # D / V
-    total_capital: float     # E + D
+    equity_weight: float  # E / V
+    debt_weight: float  # D / V
+    total_capital: float  # E + D
 
     # WACC
     wacc: float

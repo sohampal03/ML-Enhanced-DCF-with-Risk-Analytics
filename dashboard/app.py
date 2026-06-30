@@ -111,13 +111,17 @@ with st.sidebar:
         unsafe_allow_html=True,
     )
 
-    ticker_input = st.text_input(
-        "Enter Ticker Symbol",
-        value=st.session_state.ticker,
-        placeholder="e.g. AAPL, MSFT, INFY.NS",
-        label_visibility="collapsed",
-        key="ticker_input_main",
-    ).upper().strip()
+    ticker_input = (
+        st.text_input(
+            "Enter Ticker Symbol",
+            value=st.session_state.ticker,
+            placeholder="e.g. AAPL, MSFT, INFY.NS",
+            label_visibility="collapsed",
+            key="ticker_input_main",
+        )
+        .upper()
+        .strip()
+    )
 
     # Quick picks
     st.markdown(
@@ -174,8 +178,11 @@ with st.sidebar:
         if report.dcf_result:
             rec = report.dcf_result.recommendation
             rec_color = {
-                "STRONG BUY": "#00c851", "BUY": "#00c851",
-                "HOLD": "#f0b429", "SELL": "#ff4444", "STRONG SELL": "#ff4444",
+                "STRONG BUY": "#00c851",
+                "BUY": "#00c851",
+                "HOLD": "#f0b429",
+                "SELL": "#ff4444",
+                "STRONG SELL": "#ff4444",
             }.get(rec, "#8b9cc8")
             st.markdown(
                 f'<div style="color:{rec_color};font-size:13px;font-weight:700;margin-top:8px;">{rec}</div>',
@@ -250,7 +257,11 @@ if not st.session_state.report:
     col1, col2, col3, col4 = st.columns(4)
     features = [
         ("📈", "DCF Valuation", "FCFF-based two-stage DCF with Gordon Growth Model terminal value"),
-        ("🤖", "ML Forecasting", "XGBoost, LightGBM, CatBoost revenue & margin models with leaderboard"),
+        (
+            "🤖",
+            "ML Forecasting",
+            "XGBoost, LightGBM, CatBoost revenue & margin models with leaderboard",
+        ),
         ("🎲", "Monte Carlo", "10,000+ simulations quantifying valuation uncertainty"),
         ("🔍", "Explainable AI", "SHAP values explaining every prediction in plain English"),
     ]
@@ -353,13 +364,18 @@ elif st.session_state.report and st.session_state.report.is_complete:
         if report.monte_carlo:
             mc = report.monte_carlo
             from dashboard.components.cards import probability_bar
+
             probability_bar("P(Undervalued)", mc.prob_undervalued, "#00c851")
             probability_bar("P(Fairly Valued)", mc.prob_in_range, "#f0b429")
             probability_bar("P(Overvalued)", mc.prob_overvalued, "#ff4444")
         else:
             traffic_light(
                 "Valuation",
-                "green" if dcf.margin_of_safety > 0.15 else "red" if dcf.margin_of_safety < -0.15 else "yellow",
+                (
+                    "green"
+                    if dcf.margin_of_safety > 0.15
+                    else "red" if dcf.margin_of_safety < -0.15 else "yellow"
+                ),
                 f"{dcf.margin_of_safety * 100:.1f}% MOS",
             )
 

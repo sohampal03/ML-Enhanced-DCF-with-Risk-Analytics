@@ -5,6 +5,7 @@ Page 4: Forecasting Center — ML Model Comparison & Revenue Forecasts
 from __future__ import annotations
 import sys
 from pathlib import Path
+
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 import streamlit as st
@@ -28,12 +29,15 @@ if "report" not in st.session_state or not st.session_state.report:
 
 report = st.session_state.report
 
-st.markdown("""
+st.markdown(
+    """
     <h1 style="font-size:32px;font-weight:900;color:#e8edf8;margin-bottom:8px;">🤖 Forecasting Center</h1>
     <div style="color:#8b9cc8;font-size:14px;margin-bottom:28px;">
         Machine learning revenue & margin forecasting with model leaderboard
     </div>
-""", unsafe_allow_html=True)
+""",
+    unsafe_allow_html=True,
+)
 
 # ── Revenue Forecast ─────────────────────────────────────────────────────────
 rf = report.revenue_forecast
@@ -59,22 +63,29 @@ if rf:
         if rf.model_leaderboard:
             lb_df = rf.to_leaderboard_df()
             st.dataframe(lb_df.drop(columns=["Rank"]), use_container_width=True, hide_index=True)
-        
+
         st.markdown("**Feature Importances**")
         if rf.feature_importances:
             import pandas as pd
-            fi = pd.DataFrame(list(rf.feature_importances.items()), columns=["Feature", "Importance"])
+
+            fi = pd.DataFrame(
+                list(rf.feature_importances.items()), columns=["Feature", "Importance"]
+            )
             fi = fi.head(8)
-            fig_fi = go.Figure(go.Bar(
-                x=fi["Importance"], y=fi["Feature"],
-                orientation="h",
-                marker=dict(color=COLORS["primary"]),
-            ))
+            fig_fi = go.Figure(
+                go.Bar(
+                    x=fi["Importance"],
+                    y=fi["Feature"],
+                    orientation="h",
+                    marker=dict(color=COLORS["primary"]),
+                )
+            )
             fig_fi.update_layout(
                 template="plotly_dark",
                 paper_bgcolor="rgba(0,0,0,0)",
                 plot_bgcolor="rgba(0,0,0,0)",
-                height=300, margin=dict(l=10, r=10, t=20, b=10),
+                height=300,
+                margin=dict(l=10, r=10, t=20, b=10),
                 showlegend=False,
             )
             st.plotly_chart(fig_fi, use_container_width=True)
@@ -90,7 +101,7 @@ mf = report.margin_forecasts
 if mf:
     tabs = st.tabs(["EBIT Margin", "Gross Margin", "Net Margin"])
     margin_keys = ["ebit_margin", "gross_margin", "net_margin"]
-    
+
     for tab, key in zip(tabs, margin_keys):
         with tab:
             if key in mf:
@@ -118,7 +129,7 @@ income_df = report.financial_data.income_df() if report.financial_data else None
 if income_df is not None and not income_df.empty:
     income_df = income_df.sort_values("fiscal_year")
     years = income_df["fiscal_year"].tolist()
-    
+
     fig_margins = margin_trend_chart(
         years=years,
         gross_margins=income_df["gross_margin"].fillna(0).tolist(),

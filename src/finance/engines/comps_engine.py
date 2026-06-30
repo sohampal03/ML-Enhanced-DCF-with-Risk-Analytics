@@ -138,7 +138,7 @@ class CompsEngine:
         all_multiples.append(target_mult)
 
         # Peers
-        for peer in peer_tickers[:self.MAX_PEERS]:
+        for peer in peer_tickers[: self.MAX_PEERS]:
             try:
                 peer_info = yf.Ticker(peer).info or {}
                 mult = self._build_multiples(peer, peer_info, is_target=False)
@@ -154,7 +154,9 @@ class CompsEngine:
         median_ev_sales = self._median_multiple([m.ev_sales for m in peers_only])
 
         # Implied valuations from comps
-        implied_values = self._compute_implied_values(data, median_pe, median_ev_ebitda, median_ev_sales)
+        implied_values = self._compute_implied_values(
+            data, median_pe, median_ev_ebitda, median_ev_sales
+        )
 
         # Attractiveness score
         score, rank = self._compute_attractiveness(target_mult, peers_only)
@@ -175,7 +177,9 @@ class CompsEngine:
             notes=notes,
         )
 
-        logger.success(f"[CompsEngine] {ticker}: Attractiveness Score = {score:.1f}/10 (Rank {rank})")
+        logger.success(
+            f"[CompsEngine] {ticker}: Attractiveness Score = {score:.1f}/10 (Rank {rank})"
+        )
         return result
 
     def _get_peers(self, target_ticker: str, sector: Optional[str]) -> list[str]:
@@ -187,10 +191,9 @@ class CompsEngine:
             peers = [t for t in SECTOR_PEERS["Technology"] if t.upper() != target_ticker.upper()]
         return peers
 
-    def _build_multiples(
-        self, ticker: str, info: dict, is_target: bool
-    ) -> CompanyMultiples:
+    def _build_multiples(self, ticker: str, info: dict, is_target: bool) -> CompanyMultiples:
         """Build CompanyMultiples from raw info dict."""
+
         def safe_get(key: str) -> Optional[float]:
             val = info.get(key)
             if val is None or (isinstance(val, float) and (np.isnan(val) or np.isinf(val))):

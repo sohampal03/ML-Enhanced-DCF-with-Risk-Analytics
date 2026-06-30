@@ -22,9 +22,9 @@ def metric_card(
 ) -> None:
     """Render a styled KPI metric card."""
     delta_color = (
-        "#00c851" if delta_positive else
-        "#ff4444" if delta_positive is not None and not delta_positive else
-        "#8b9cc8"
+        "#00c851"
+        if delta_positive
+        else "#ff4444" if delta_positive is not None and not delta_positive else "#8b9cc8"
     )
     delta_html = (
         f'<div class="metric-delta" style="color:{delta_color};">'
@@ -104,10 +104,10 @@ def recommendation_badge(recommendation: str) -> None:
 def info_box(text: str, level: str = "info") -> None:
     """Render a colored info/warning/success box."""
     colors = {
-        "info":    ("#00bcd4", "rgba(0,188,212,0.08)", "ℹ"),
+        "info": ("#00bcd4", "rgba(0,188,212,0.08)", "ℹ"),
         "warning": ("#f0b429", "rgba(240,180,41,0.08)", "⚠"),
         "success": ("#00c851", "rgba(0,200,81,0.08)", "✓"),
-        "danger":  ("#ff4444", "rgba(255,68,68,0.08)", "✕"),
+        "danger": ("#ff4444", "rgba(255,68,68,0.08)", "✕"),
     }
     c, bg, icon = colors.get(level, colors["info"])
 
@@ -162,8 +162,11 @@ def valuation_summary_banner(
     upside = (intrinsic_value - current_price) / current_price * 100 if current_price > 0 else 0
     mos_pct = margin_of_safety * 100
     rec_color = {
-        "STRONG BUY": "#00c851", "BUY": "#00c851",
-        "HOLD": "#f0b429", "SELL": "#ff4444", "STRONG SELL": "#ff4444",
+        "STRONG BUY": "#00c851",
+        "BUY": "#00c851",
+        "HOLD": "#f0b429",
+        "SELL": "#ff4444",
+        "STRONG SELL": "#ff4444",
     }.get(recommendation.upper(), "#8b9cc8")
 
     st.markdown(

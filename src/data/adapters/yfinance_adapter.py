@@ -23,6 +23,7 @@ except ImportError:
 
 try:
     from curl_cffi import requests as curl_requests
+
     _CURL_SESSION = curl_requests.Session(impersonate="chrome")
     _HAS_CURL = True
     logger.info("curl_cffi session active — Yahoo Finance rate limiting bypassed")
@@ -216,21 +217,15 @@ class YFinanceAdapter:
                 interest = self._get_value(row, ["Interest Expense", "Net Interest Income"])
                 pretax = self._get_value(row, ["Pretax Income"])
                 tax = self._get_value(row, ["Tax Provision", "Income Tax Expense"])
-                net_income = self._get_value(
-                    row, ["Net Income", "Net Income Common Stockholders"]
-                )
+                net_income = self._get_value(row, ["Net Income", "Net Income Common Stockholders"])
                 sga = self._get_value(row, ["Selling General Administrative", "SGA"])
                 rd = self._get_value(row, ["Research And Development"])
                 opex = self._get_value(row, ["Operating Expense", "Total Expenses"])
                 eps = self._get_value(row, ["Diluted EPS", "Basic EPS"])
-                shares = self._get_value(
-                    row, ["Diluted Average Shares", "Basic Average Shares"]
-                )
+                shares = self._get_value(row, ["Diluted Average Shares", "Basic Average Shares"])
 
                 year = (
-                    period_date.year
-                    if hasattr(period_date, "year")
-                    else int(str(period_date)[:4])
+                    period_date.year if hasattr(period_date, "year") else int(str(period_date)[:4])
                 )
 
                 stmt = AnnualIncomeStatement(
@@ -264,9 +259,7 @@ class YFinanceAdapter:
 
         return results
 
-    def _parse_balance_sheets(
-        self, ticker: str, stock: yf.Ticker
-    ) -> list[AnnualBalanceSheet]:
+    def _parse_balance_sheets(self, ticker: str, stock: yf.Ticker) -> list[AnnualBalanceSheet]:
         """Parse annual balance sheets."""
         try:
             df = stock.balance_sheet
@@ -282,14 +275,19 @@ class YFinanceAdapter:
         for period_date, row in df.iterrows():
             try:
                 cash = self._get_value(
-                    row, ["Cash And Cash Equivalents", "Cash Cash Equivalents And Short Term Investments"]
+                    row,
+                    [
+                        "Cash And Cash Equivalents",
+                        "Cash Cash Equivalents And Short Term Investments",
+                    ],
                 )
                 sti = self._get_value(row, ["Short Term Investments"])
                 ar = self._get_value(row, ["Accounts Receivable", "Net Receivables"])
                 inventory = self._get_value(row, ["Inventory"])
                 current_assets = self._get_value(row, ["Current Assets", "Total Current Assets"])
                 ppe = self._get_value(
-                    row, ["Net PPE", "Property Plant Equipment Net", "Net Property Plant And Equipment"]
+                    row,
+                    ["Net PPE", "Property Plant Equipment Net", "Net Property Plant And Equipment"],
                 )
                 goodwill = self._get_value(row, ["Goodwill"])
                 intangibles = self._get_value(row, ["Intangible Assets", "Other Intangible Assets"])
@@ -299,9 +297,13 @@ class YFinanceAdapter:
                 current_liab = self._get_value(
                     row, ["Current Liabilities", "Total Current Liabilities"]
                 )
-                ltd = self._get_value(row, ["Long Term Debt", "Long Term Debt And Capital Lease Obligation"])
+                ltd = self._get_value(
+                    row, ["Long Term Debt", "Long Term Debt And Capital Lease Obligation"]
+                )
                 total_debt = self._get_value(row, ["Total Debt"])
-                total_liab = self._get_value(row, ["Total Liabilities Net Minority Interest", "Total Liab"])
+                total_liab = self._get_value(
+                    row, ["Total Liabilities Net Minority Interest", "Total Liab"]
+                )
                 equity = self._get_value(
                     row,
                     ["Stockholders Equity", "Total Stockholders Equity", "Common Stock Equity"],
@@ -309,9 +311,7 @@ class YFinanceAdapter:
                 retained = self._get_value(row, ["Retained Earnings"])
 
                 year = (
-                    period_date.year
-                    if hasattr(period_date, "year")
-                    else int(str(period_date)[:4])
+                    period_date.year if hasattr(period_date, "year") else int(str(period_date)[:4])
                 )
 
                 # Net working capital: current assets - current liabilities
@@ -351,9 +351,7 @@ class YFinanceAdapter:
 
         return results
 
-    def _parse_cash_flows(
-        self, ticker: str, stock: yf.Ticker
-    ) -> list[AnnualCashFlowStatement]:
+    def _parse_cash_flows(self, ticker: str, stock: yf.Ticker) -> list[AnnualCashFlowStatement]:
         """Parse annual cash flow statements."""
         try:
             df = stock.cashflow
@@ -368,7 +366,9 @@ class YFinanceAdapter:
         results: list[AnnualCashFlowStatement] = []
         for period_date, row in df.iterrows():
             try:
-                net_income = self._get_value(row, ["Net Income", "Net Income From Continuing Operations"])
+                net_income = self._get_value(
+                    row, ["Net Income", "Net Income From Continuing Operations"]
+                )
                 da = self._get_value(
                     row,
                     [
@@ -378,7 +378,9 @@ class YFinanceAdapter:
                     ],
                 )
                 sbc = self._get_value(row, ["Stock Based Compensation"])
-                wc_change = self._get_value(row, ["Change In Working Capital", "Changes In Account Receivables"])
+                wc_change = self._get_value(
+                    row, ["Change In Working Capital", "Changes In Account Receivables"]
+                )
                 ocf = self._get_value(row, ["Operating Cash Flow", "Cash From Operations"])
                 capex = self._get_value(
                     row, ["Capital Expenditure", "Capital Expenditures", "Purchase Of PPE"]
@@ -387,18 +389,16 @@ class YFinanceAdapter:
                 icf = self._get_value(row, ["Investing Cash Flow", "Cash From Investing"])
                 debt_repay = self._get_value(row, ["Repayment Of Debt", "Debt Repayment"])
                 dividends = self._get_value(row, ["Payment Of Dividends", "Cash Dividends Paid"])
-                repurchases = self._get_value(row, ["Repurchase Of Capital Stock", "Common Stock Repurchased"])
+                repurchases = self._get_value(
+                    row, ["Repurchase Of Capital Stock", "Common Stock Repurchased"]
+                )
                 fcf = self._get_value(row, ["Free Cash Flow"])
                 fcf_calc = (
-                    self._subtract(ocf, abs(capex) if capex else 0)
-                    if ocf and capex
-                    else None
+                    self._subtract(ocf, abs(capex) if capex else 0) if ocf and capex else None
                 )
 
                 year = (
-                    period_date.year
-                    if hasattr(period_date, "year")
-                    else int(str(period_date)[:4])
+                    period_date.year if hasattr(period_date, "year") else int(str(period_date)[:4])
                 )
 
                 cf = AnnualCashFlowStatement(
@@ -431,7 +431,9 @@ class YFinanceAdapter:
         try:
             period = f"{min(years, 10)}y"
             session = _CURL_SESSION if _HAS_CURL else None
-            df = yf.download(ticker, period=period, auto_adjust=True, progress=False, session=session)
+            df = yf.download(
+                ticker, period=period, auto_adjust=True, progress=False, session=session
+            )
             if df.empty:
                 return None
             df.columns = [col[0] if isinstance(col, tuple) else col for col in df.columns]

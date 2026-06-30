@@ -36,11 +36,11 @@ class DCFYearProjection:
     ebit: float
     tax_rate: float
     nopat: float
-    da_rate: float          # D&A as % of revenue
+    da_rate: float  # D&A as % of revenue
     da: float
-    capex_rate: float       # CAPEX as % of revenue
+    capex_rate: float  # CAPEX as % of revenue
     capex: float
-    nwc_rate: float         # NWC as % of revenue
+    nwc_rate: float  # NWC as % of revenue
     delta_nwc: float
     fcff: float
     discount_factor: float
@@ -96,7 +96,7 @@ class DCFResult:
 
     # Margin of Safety
     margin_of_safety: float = 0.0
-    upside_potential: float = 0.0   # (intrinsic - price) / price
+    upside_potential: float = 0.0  # (intrinsic - price) / price
 
     # Recommendation
     recommendation: str = "HOLD"
@@ -152,11 +152,11 @@ class DCFEngine:
     """
 
     MOS_THRESHOLDS = {
-        "STRONG BUY": 0.30,   # >30% upside
-        "BUY": 0.10,           # 10–30% upside
-        "HOLD": -0.10,         # ±10%
-        "SELL": -0.30,         # 10–30% downside
-        "STRONG SELL": -1.0,   # >30% downside
+        "STRONG BUY": 0.30,  # >30% upside
+        "BUY": 0.10,  # 10–30% upside
+        "HOLD": -0.10,  # ±10%
+        "SELL": -0.30,  # 10–30% downside
+        "STRONG SELL": -1.0,  # >30% downside
     }
 
     def compute(
@@ -217,7 +217,9 @@ class DCFEngine:
             data, fcff_result
         )
 
-        growth_rates = revenue_growth_rates or self._build_growth_schedule(hist_growth, forecast_years)
+        growth_rates = revenue_growth_rates or self._build_growth_schedule(
+            hist_growth, forecast_years
+        )
         margin = ebit_margin or hist_margin
         da_pct = da_pct_revenue or hist_da
         capex_pct = capex_pct_revenue or hist_capex
@@ -284,7 +286,11 @@ class DCFEngine:
         # ── Step 6: Margin of Safety & Recommendation ────────────────────
         current_price = data.company_info.current_price or 0.0
         upside = (intrinsic_per_share - current_price) / current_price if current_price > 0 else 0
-        mos = (intrinsic_per_share - current_price) / intrinsic_per_share if intrinsic_per_share > 0 else 0
+        mos = (
+            (intrinsic_per_share - current_price) / intrinsic_per_share
+            if intrinsic_per_share > 0
+            else 0
+        )
 
         recommendation, color, confidence = self._make_recommendation(upside, wacc_result)
 
@@ -404,8 +410,8 @@ class DCFEngine:
 
         Starts at historical average, linearly declines to 3% by terminal year.
         """
-        start = min(max(hist_growth, 0.02), 0.40)   # Clamp: 2% – 40%
-        end = 0.03                                    # 3% steady-state
+        start = min(max(hist_growth, 0.02), 0.40)  # Clamp: 2% – 40%
+        end = 0.03  # 3% steady-state
         return list(np.linspace(start, end, years))
 
     def _get_base_revenue(self, data: FinancialData) -> float:
@@ -420,8 +426,11 @@ class DCFEngine:
 
     def _get_cash(self, data: FinancialData) -> float:
         balance = data.latest_balance
-        return (balance.cash_and_equivalents or 0) + (balance.short_term_investments or 0) \
-            if balance else 0.0
+        return (
+            (balance.cash_and_equivalents or 0) + (balance.short_term_investments or 0)
+            if balance
+            else 0.0
+        )
 
     def _make_recommendation(
         self, upside: float, wacc_result: WACCBreakdown

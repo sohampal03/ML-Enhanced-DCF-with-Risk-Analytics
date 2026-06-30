@@ -10,6 +10,7 @@ from dataclasses import dataclass, field
 @dataclass
 class FinanceConcept:
     """A structured finance or ML concept for the Learning Center."""
+
     name: str
     icon: str
     definition: str

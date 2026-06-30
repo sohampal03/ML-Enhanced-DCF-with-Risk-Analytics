@@ -51,21 +51,51 @@ class FeatureEngineer:
         balance_df = data.balance_df().sort_values("fiscal_year")
         cashflow_df = data.cashflow_df().sort_values("fiscal_year")
 
-        df = income_df[["fiscal_year", "revenue", "gross_profit", "ebit",
-                         "net_income", "ebitda", "depreciation_amortization",
-                         "gross_margin", "ebit_margin", "net_margin"]].copy()
+        df = income_df[
+            [
+                "fiscal_year",
+                "revenue",
+                "gross_profit",
+                "ebit",
+                "net_income",
+                "ebitda",
+                "depreciation_amortization",
+                "gross_margin",
+                "ebit_margin",
+                "net_margin",
+            ]
+        ].copy()
 
         # Merge balance and cashflow data
         df = df.merge(
-            balance_df[["fiscal_year", "total_assets", "total_debt", "total_equity",
-                        "cash_and_equivalents", "net_working_capital", "total_current_assets",
-                        "total_current_liabilities"]],
-            on="fiscal_year", how="left",
+            balance_df[
+                [
+                    "fiscal_year",
+                    "total_assets",
+                    "total_debt",
+                    "total_equity",
+                    "cash_and_equivalents",
+                    "net_working_capital",
+                    "total_current_assets",
+                    "total_current_liabilities",
+                ]
+            ],
+            on="fiscal_year",
+            how="left",
         )
         df = df.merge(
-            cashflow_df[["fiscal_year", "operating_cash_flow", "capital_expenditures",
-                         "free_cash_flow", "depreciation_amortization"]],
-            on="fiscal_year", how="left", suffixes=("", "_cf"),
+            cashflow_df[
+                [
+                    "fiscal_year",
+                    "operating_cash_flow",
+                    "capital_expenditures",
+                    "free_cash_flow",
+                    "depreciation_amortization",
+                ]
+            ],
+            on="fiscal_year",
+            how="left",
+            suffixes=("", "_cf"),
         )
 
         # Use cash flow D&A if income D&A is missing
@@ -82,9 +112,7 @@ class FeatureEngineer:
         df["gross_margin"] = df["gross_margin"].fillna(
             df["gross_profit"] / df["revenue"].replace(0, np.nan)
         )
-        df["ebit_margin"] = df["ebit_margin"].fillna(
-            df["ebit"] / df["revenue"].replace(0, np.nan)
-        )
+        df["ebit_margin"] = df["ebit_margin"].fillna(df["ebit"] / df["revenue"].replace(0, np.nan))
         df["net_margin"] = df["net_margin"].fillna(
             df["net_income"] / df["revenue"].replace(0, np.nan)
         )
@@ -96,18 +124,22 @@ class FeatureEngineer:
         # ── Leverage & Liquidity ──────────────────────────────────────────────
         df["debt_to_equity"] = df["total_debt"] / df["total_equity"].replace(0, np.nan)
         df["debt_to_assets"] = df["total_debt"] / df["total_assets"].replace(0, np.nan)
-        df["current_ratio"] = (
-            df["total_current_assets"] / df["total_current_liabilities"].replace(0, np.nan)
+        df["current_ratio"] = df["total_current_assets"] / df["total_current_liabilities"].replace(
+            0, np.nan
         )
-        df["net_debt_to_ebitda"] = (
-            (df["total_debt"] - df["cash_and_equivalents"]) / df["ebitda"].replace(0, np.nan)
-        )
+        df["net_debt_to_ebitda"] = (df["total_debt"] - df["cash_and_equivalents"]) / df[
+            "ebitda"
+        ].replace(0, np.nan)
         df["interest_coverage"] = df["ebit"] / (df["total_debt"] * 0.05).replace(0, np.nan)
 
         # ── Capex & Investment ────────────────────────────────────────────────
-        df["capex_pct_revenue"] = df["capital_expenditures"].abs() / df["revenue"].replace(0, np.nan)
+        df["capex_pct_revenue"] = df["capital_expenditures"].abs() / df["revenue"].replace(
+            0, np.nan
+        )
         df["da_pct_revenue"] = df["da"] / df["revenue"].replace(0, np.nan)
-        df["capex_pct_assets"] = df["capital_expenditures"].abs() / df["total_assets"].replace(0, np.nan)
+        df["capex_pct_assets"] = df["capital_expenditures"].abs() / df["total_assets"].replace(
+            0, np.nan
+        )
 
         # ── Cash Quality ──────────────────────────────────────────────────────
         df["ocf_to_net_income"] = df["operating_cash_flow"] / df["net_income"].replace(0, np.nan)
@@ -128,8 +160,12 @@ class FeatureEngineer:
 
         # Drop raw financials (keep only engineered features)
         raw_cols = [
-            "gross_profit", "net_income", "depreciation_amortization",
-            "depreciation_amortization_cf", "da", "total_current_assets",
+            "gross_profit",
+            "net_income",
+            "depreciation_amortization",
+            "depreciation_amortization_cf",
+            "da",
+            "total_current_assets",
             "total_current_liabilities",
         ]
         df = df.drop(columns=[c for c in raw_cols if c in df.columns], errors="ignore")
@@ -173,9 +209,7 @@ class FeatureEngineer:
         y_clean = y[mask]
 
         if len(X_clean) < 3:
-            raise ValueError(
-                f"Insufficient clean data ({len(X_clean)} rows) for {data.ticker}"
-            )
+            raise ValueError(f"Insufficient clean data ({len(X_clean)} rows) for {data.ticker}")
 
         logger.info(f"Training data shape: X={X_clean.shape}, y={y_clean.shape}")
         return X_clean, y_clean

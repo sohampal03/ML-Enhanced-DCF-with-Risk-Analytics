@@ -2,9 +2,11 @@
 Integration test: full valuation pipeline end-to-end.
 Uses synthetic data to avoid network calls.
 """
+
 import pytest
 import sys
 from pathlib import Path
+
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from src.valuation.orchestrator import ValuationOrchestrator, FullValuationReport
@@ -13,6 +15,7 @@ from tests.unit.test_fcff_engine import make_sample_data
 
 class MockRepository:
     """Repository that returns synthetic data without network calls."""
+
     def get_financial_data(self, ticker, **kwargs):
         return make_sample_data(ticker)
 
@@ -51,8 +54,12 @@ class TestFullPipeline:
 
     def test_wacc_override_propagates(self):
         orch = self._make_orchestrator_with_mock()
-        r1 = orch.analyze("TEST", wacc_override=0.06, run_ml=False, run_monte_carlo=False, run_comps=False)
-        r2 = orch.analyze("TEST", wacc_override=0.15, run_ml=False, run_monte_carlo=False, run_comps=False)
+        r1 = orch.analyze(
+            "TEST", wacc_override=0.06, run_ml=False, run_monte_carlo=False, run_comps=False
+        )
+        r2 = orch.analyze(
+            "TEST", wacc_override=0.15, run_ml=False, run_monte_carlo=False, run_comps=False
+        )
         if r1.dcf_result and r2.dcf_result:
             assert r1.dcf_result.intrinsic_value_per_share > r2.dcf_result.intrinsic_value_per_share
 

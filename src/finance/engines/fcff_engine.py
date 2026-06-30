@@ -34,11 +34,11 @@ class FCFFBreakdown:
     revenue: Optional[float]
     ebit: Optional[float]
     tax_rate: Optional[float]
-    nopat: Optional[float]          # EBIT × (1 - Tax Rate)
+    nopat: Optional[float]  # EBIT × (1 - Tax Rate)
     depreciation: Optional[float]
     capex: Optional[float]
-    delta_nwc: Optional[float]      # Change in Net Working Capital
-    fcff: Optional[float]           # NOPAT + D&A - ΔNWC - CAPEX
+    delta_nwc: Optional[float]  # Change in Net Working Capital
+    fcff: Optional[float]  # NOPAT + D&A - ΔNWC - CAPEX
 
     # Derived ratios
     ebit_margin: Optional[float] = None
@@ -144,9 +144,7 @@ class FCFFEngine:
             return FCFFResult(ticker=ticker, notes=["Insufficient data for FCFF calculation"])
 
         # Compute average tax rate (will be used when individual year rate is missing)
-        avg_tax = self._compute_avg_tax_rate(
-            [income_map[y] for y in years if y in income_map]
-        )
+        avg_tax = self._compute_avg_tax_rate([income_map[y] for y in years if y in income_map])
 
         breakdowns: list[FCFFBreakdown] = []
         for i, year in enumerate(years):
@@ -218,11 +216,7 @@ class FCFFEngine:
         nopat = ebit * (1 - tax_rate) if ebit is not None else None
 
         # 4. D&A — prefer cash flow statement over income statement
-        da = (
-            cashflow.depreciation_amortization
-            or income.depreciation_amortization
-            or 0.0
-        )
+        da = cashflow.depreciation_amortization or income.depreciation_amortization or 0.0
 
         # 5. CAPEX — use absolute value (capex is typically negative in yfinance)
         capex_raw = cashflow.capital_expenditures or 0.0
@@ -231,7 +225,9 @@ class FCFFEngine:
         # 6. ΔNWC = NWC_current - NWC_previous
         nwc_curr = balance.net_working_capital
         nwc_prev = prev_balance.net_working_capital if prev_balance else None
-        delta_nwc = (nwc_curr - nwc_prev) if (nwc_curr is not None and nwc_prev is not None) else 0.0
+        delta_nwc = (
+            (nwc_curr - nwc_prev) if (nwc_curr is not None and nwc_prev is not None) else 0.0
+        )
 
         # 7. FCFF = NOPAT + D&A − ΔNWC − CAPEX
         if nopat is not None:
@@ -263,7 +259,10 @@ class FCFFEngine:
 
     def _get_tax_rate(self, income: AnnualIncomeStatement, fallback: float) -> float:
         """Get effective tax rate, falling back to average or default."""
-        if income.effective_tax_rate and self.MIN_TAX_RATE <= income.effective_tax_rate <= self.MAX_TAX_RATE:
+        if (
+            income.effective_tax_rate
+            and self.MIN_TAX_RATE <= income.effective_tax_rate <= self.MAX_TAX_RATE
+        ):
             return income.effective_tax_rate
         if income.income_tax and income.pretax_income and income.pretax_income > 0:
             computed = income.income_tax / income.pretax_income

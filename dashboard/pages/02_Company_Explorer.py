@@ -5,13 +5,19 @@ Page 2: Company Explorer — Business overview, price history, peer comparison
 from __future__ import annotations
 import sys
 from pathlib import Path
+
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 import streamlit as st
 import pandas as pd
 
 from dashboard.components.cards import metric_card, section_divider, info_box
-from dashboard.components.charts import candlestick_chart, peer_radar_chart, financial_bar_chart, COLORS
+from dashboard.components.charts import (
+    candlestick_chart,
+    peer_radar_chart,
+    financial_bar_chart,
+    COLORS,
+)
 from src.utils.helpers import format_currency, format_percentage, format_multiple
 
 st.set_page_config(page_title="Company Explorer | AlphaForge", layout="wide", page_icon="🏢")
@@ -29,12 +35,15 @@ report = st.session_state.report
 data = report.financial_data
 info = data.company_info
 
-st.markdown(f"""
+st.markdown(
+    f"""
     <h1 style="font-size:32px;font-weight:900;color:#e8edf8;margin-bottom:4px;">🏢 {info.name}</h1>
     <div style="color:#8b9cc8;font-size:14px;margin-bottom:28px;">
         {info.sector or 'N/A'} · {info.industry or 'N/A'} · {info.country or 'N/A'} · {info.exchange or 'N/A'}
     </div>
-""", unsafe_allow_html=True)
+""",
+    unsafe_allow_html=True,
+)
 
 # ── KPI Row ───────────────────────────────────────────────────────────────────
 c1, c2, c3, c4, c5, c6 = st.columns(6)
@@ -67,7 +76,7 @@ if data.price_history:
     try:
         price_df = pd.DataFrame(data.price_history)
         if not isinstance(price_df.index, pd.DatetimeIndex):
-            price_df.index = pd.to_datetime(list(price_df.keys())[:len(price_df)])
+            price_df.index = pd.to_datetime(list(price_df.keys())[: len(price_df)])
 
         period_opts = {"1Y": -252, "3Y": -756, "5Y": -1260, "All": 0}
         period = st.radio("Period", list(period_opts.keys()), horizontal=True, index=2)
@@ -111,7 +120,18 @@ if not income_df.empty:
 st.markdown("---")
 section_divider("Key Financial Ratios")
 ratios_data = {
-    "Metric": ["P/E Ratio", "Forward P/E", "P/B Ratio", "EV/EBITDA", "Debt/Equity", "ROE", "ROA", "Net Margin", "Revenue Growth", "Dividend Yield"],
+    "Metric": [
+        "P/E Ratio",
+        "Forward P/E",
+        "P/B Ratio",
+        "EV/EBITDA",
+        "Debt/Equity",
+        "ROE",
+        "ROA",
+        "Net Margin",
+        "Revenue Growth",
+        "Dividend Yield",
+    ],
     "Value": [
         format_multiple(info.pe_ratio),
         format_multiple(info.forward_pe),
@@ -130,14 +150,17 @@ st.dataframe(pd.DataFrame(ratios_data), use_container_width=True, hide_index=Tru
 # ── Comps Peer Table ──────────────────────────────────────────────────────────
 if report.comps_result and report.comps_result.company_multiples:
     st.markdown("---")
-    section_divider("Peer Comparison", badge=f"{len(report.comps_result.company_multiples)} companies")
-    
+    section_divider(
+        "Peer Comparison", badge=f"{len(report.comps_result.company_multiples)} companies"
+    )
+
     comps_df = report.comps_result.to_dataframe()
+
     # Highlight target row
     def highlight_target(row):
         if row.get("Is Target", False):
             return ["background-color: rgba(26,108,245,0.1)"] * len(row)
         return [""] * len(row)
-    
+
     display_df = comps_df.drop(columns=["Is Target"], errors="ignore")
     st.dataframe(display_df, use_container_width=True, hide_index=True)

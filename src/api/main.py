@@ -1,4 +1,5 @@
 """FastAPI backend application."""
+
 from __future__ import annotations
 
 from contextlib import asynccontextmanager
@@ -17,6 +18,7 @@ configure_logging(settings.log_level)
 
 # Global orchestrator (singleton)
 _orchestrator: Optional[ValuationOrchestrator] = None
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):

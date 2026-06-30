@@ -48,7 +48,9 @@ def configure_logging(
 
     # File handler — rotating with compression
     if log_file:
-        file_format = "{time:YYYY-MM-DD HH:mm:ss} | {level: <8} | {name}:{function}:{line} | {message}"
+        file_format = (
+            "{time:YYYY-MM-DD HH:mm:ss} | {level: <8} | {name}:{function}:{line} | {message}"
+        )
         log_file.parent.mkdir(parents=True, exist_ok=True)
         logger.add(
             str(log_file),

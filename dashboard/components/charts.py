@@ -88,7 +88,8 @@ def candlestick_chart(
     """Candlestick chart with volume bars."""
     if show_volume and "Volume" in price_df.columns:
         fig = make_subplots(
-            rows=2, cols=1,
+            rows=2,
+            cols=1,
             shared_xaxes=True,
             row_heights=[0.75, 0.25],
             vertical_spacing=0.04,
@@ -152,35 +153,41 @@ def revenue_forecast_chart(
     fig = go.Figure()
 
     # Historical
-    fig.add_trace(go.Scatter(
-        x=historical_years,
-        y=historical_values,
-        mode="lines+markers",
-        name="Historical",
-        line=dict(color=COLORS["primary"], width=2.5),
-        marker=dict(size=6, color=COLORS["primary"]),
-    ))
+    fig.add_trace(
+        go.Scatter(
+            x=historical_years,
+            y=historical_values,
+            mode="lines+markers",
+            name="Historical",
+            line=dict(color=COLORS["primary"], width=2.5),
+            marker=dict(size=6, color=COLORS["primary"]),
+        )
+    )
 
     # Confidence band (add upper first, then lower with fill)
-    fig.add_trace(go.Scatter(
-        x=forecast_years + forecast_years[::-1],
-        y=upper_ci + lower_ci[::-1],
-        fill="toself",
-        fillcolor="rgba(26,108,245,0.12)",
-        line=dict(color="rgba(0,0,0,0)"),
-        name="90% CI",
-        showlegend=True,
-    ))
+    fig.add_trace(
+        go.Scatter(
+            x=forecast_years + forecast_years[::-1],
+            y=upper_ci + lower_ci[::-1],
+            fill="toself",
+            fillcolor="rgba(26,108,245,0.12)",
+            line=dict(color="rgba(0,0,0,0)"),
+            name="90% CI",
+            showlegend=True,
+        )
+    )
 
     # Forecast line
-    fig.add_trace(go.Scatter(
-        x=forecast_years,
-        y=forecast_values,
-        mode="lines+markers",
-        name="Forecast",
-        line=dict(color=COLORS["gold"], width=2.5, dash="dash"),
-        marker=dict(size=7, color=COLORS["gold"], symbol="diamond"),
-    ))
+    fig.add_trace(
+        go.Scatter(
+            x=forecast_years,
+            y=forecast_values,
+            mode="lines+markers",
+            name="Forecast",
+            line=dict(color=COLORS["gold"], width=2.5, dash="dash"),
+            marker=dict(size=7, color=COLORS["gold"], symbol="diamond"),
+        )
+    )
 
     # Vertical separator
     split_year = historical_years[-1] if historical_years else forecast_years[0] - 1
@@ -228,29 +235,38 @@ def dcf_waterfall_chart(
     measure = ["relative", "relative", "total", "relative", "relative", "total"]
 
     # Colors per bar
-    bar_colors = [COLORS["primary"], COLORS["gold"], "#2a5a9c", COLORS["bear"], COLORS["bull"], "#1557cc"]
+    bar_colors = [
+        COLORS["primary"],
+        COLORS["gold"],
+        "#2a5a9c",
+        COLORS["bear"],
+        COLORS["bull"],
+        "#1557cc",
+    ]
 
-    fig = go.Figure(go.Waterfall(
-        name="DCF Breakdown",
-        orientation="v",
-        measure=measure,
-        x=categories,
-        y=values,
-        connector=dict(line=dict(color="#1e2d4a", width=1.5)),
-        increasing=dict(marker=dict(color=COLORS["bull"])),
-        decreasing=dict(marker=dict(color=COLORS["bear"])),
-        totals=dict(marker=dict(color=COLORS["primary"])),
-        text=[
-            f"${pv_fcff / 1e9:.1f}B",
-            f"${pv_terminal / 1e9:.1f}B",
-            f"${enterprise_value / 1e9:.1f}B",
-            f"-${total_debt / 1e9:.1f}B",
-            f"+${cash / 1e9:.1f}B",
-            f"${equity_value / 1e9:.1f}B",
-        ],
-        textposition="outside",
-        textfont=dict(color="#e8edf8"),
-    ))
+    fig = go.Figure(
+        go.Waterfall(
+            name="DCF Breakdown",
+            orientation="v",
+            measure=measure,
+            x=categories,
+            y=values,
+            connector=dict(line=dict(color="#1e2d4a", width=1.5)),
+            increasing=dict(marker=dict(color=COLORS["bull"])),
+            decreasing=dict(marker=dict(color=COLORS["bear"])),
+            totals=dict(marker=dict(color=COLORS["primary"])),
+            text=[
+                f"${pv_fcff / 1e9:.1f}B",
+                f"${pv_terminal / 1e9:.1f}B",
+                f"${enterprise_value / 1e9:.1f}B",
+                f"-${total_debt / 1e9:.1f}B",
+                f"+${cash / 1e9:.1f}B",
+                f"${equity_value / 1e9:.1f}B",
+            ],
+            textposition="outside",
+            textfont=dict(color="#e8edf8"),
+        )
+    )
 
     _fig_defaults(fig, height=450)
     fig.update_layout(
@@ -281,24 +297,26 @@ def sensitivity_heatmap(
         [1.0, COLORS["bull"]],
     ]
 
-    fig = go.Figure(go.Heatmap(
-        z=z,
-        x=sensitivity_df.columns.tolist(),
-        y=sensitivity_df.index.tolist(),
-        colorscale=colorscale,
-        zmid=current_price,
-        text=[[f"${v:.0f}" if not np.isnan(v) else "—" for v in row] for row in z],
-        texttemplate="%{text}",
-        textfont=dict(size=11, color="white"),
-        hovertemplate="WACC: %{y}<br>TGR: %{x}<br>Intrinsic: $%{z:.2f}<extra></extra>",
-        showscale=True,
-        colorbar=dict(
-            title=dict(text="Intrinsic Value ($)", side="right"),
-            tickfont=dict(color="#8b9cc8"),
-            bgcolor="rgba(15,22,40,0.9)",
-            bordercolor="#1e2d4a",
-        ),
-    ))
+    fig = go.Figure(
+        go.Heatmap(
+            z=z,
+            x=sensitivity_df.columns.tolist(),
+            y=sensitivity_df.index.tolist(),
+            colorscale=colorscale,
+            zmid=current_price,
+            text=[[f"${v:.0f}" if not np.isnan(v) else "—" for v in row] for row in z],
+            texttemplate="%{text}",
+            textfont=dict(size=11, color="white"),
+            hovertemplate="WACC: %{y}<br>TGR: %{x}<br>Intrinsic: $%{z:.2f}<extra></extra>",
+            showscale=True,
+            colorbar=dict(
+                title=dict(text="Intrinsic Value ($)", side="right"),
+                tickfont=dict(color="#8b9cc8"),
+                bgcolor="rgba(15,22,40,0.9)",
+                bordercolor="#1e2d4a",
+            ),
+        )
+    )
 
     _fig_defaults(fig, height=380)
     fig.update_layout(
@@ -323,16 +341,18 @@ def monte_carlo_histogram(
     """Monte Carlo intrinsic value distribution with key percentile bands."""
     fig = go.Figure()
 
-    fig.add_trace(go.Histogram(
-        x=intrinsic_values,
-        nbinsx=80,
-        name="Simulated Values",
-        marker=dict(
-            color=COLORS["primary"],
-            opacity=0.7,
-            line=dict(color=COLORS["primary"], width=0.2),
-        ),
-    ))
+    fig.add_trace(
+        go.Histogram(
+            x=intrinsic_values,
+            nbinsx=80,
+            name="Simulated Values",
+            marker=dict(
+                color=COLORS["primary"],
+                opacity=0.7,
+                line=dict(color=COLORS["primary"], width=0.2),
+            ),
+        )
+    )
 
     # Current price line
     fig.add_vline(
@@ -385,31 +405,35 @@ def tornado_chart(tornado_data: dict, ticker: str) -> go.Figure:
 
     fig = go.Figure()
 
-    fig.add_trace(go.Bar(
-        name="High (90th pct)",
-        y=labels,
-        x=[h - l for h, l in zip(high_vals, low_vals)],
-        orientation="h",
-        base=low_vals,
-        marker_color=COLORS["bull"],
-        marker_opacity=0.8,
-        text=[f"${h:,.0f}" for h in high_vals],
-        textposition="outside",
-        textfont=dict(color=COLORS["bull"]),
-    ))
+    fig.add_trace(
+        go.Bar(
+            name="High (90th pct)",
+            y=labels,
+            x=[h - l for h, l in zip(high_vals, low_vals)],
+            orientation="h",
+            base=low_vals,
+            marker_color=COLORS["bull"],
+            marker_opacity=0.8,
+            text=[f"${h:,.0f}" for h in high_vals],
+            textposition="outside",
+            textfont=dict(color=COLORS["bull"]),
+        )
+    )
 
-    fig.add_trace(go.Bar(
-        name="Low (10th pct)",
-        y=labels,
-        x=[l - l for l in low_vals],  # zero width (base already set)
-        orientation="h",
-        base=[0] * len(low_vals),
-        marker_color=COLORS["bear"],
-        text=[f"${l:,.0f}" for l in low_vals],
-        textposition="inside",
-        textfont=dict(color="white"),
-        showlegend=False,
-    ))
+    fig.add_trace(
+        go.Bar(
+            name="Low (10th pct)",
+            y=labels,
+            x=[l - l for l in low_vals],  # zero width (base already set)
+            orientation="h",
+            base=[0] * len(low_vals),
+            marker_color=COLORS["bear"],
+            text=[f"${l:,.0f}" for l in low_vals],
+            textposition="inside",
+            textfont=dict(color="white"),
+            showlegend=False,
+        )
+    )
 
     _fig_defaults(fig, height=400)
     fig.update_layout(
@@ -438,19 +462,27 @@ def peer_radar_chart(
 
     fig = go.Figure()
 
-    fig.add_trace(go.Scatterpolar(
-        r=p_vals, theta=cats, fill="toself",
-        name=peer_label,
-        fillcolor="rgba(240,180,41,0.1)",
-        line=dict(color=COLORS["gold"], width=2),
-    ))
+    fig.add_trace(
+        go.Scatterpolar(
+            r=p_vals,
+            theta=cats,
+            fill="toself",
+            name=peer_label,
+            fillcolor="rgba(240,180,41,0.1)",
+            line=dict(color=COLORS["gold"], width=2),
+        )
+    )
 
-    fig.add_trace(go.Scatterpolar(
-        r=t_vals, theta=cats, fill="toself",
-        name=target_name,
-        fillcolor="rgba(26,108,245,0.15)",
-        line=dict(color=COLORS["primary"], width=2.5),
-    ))
+    fig.add_trace(
+        go.Scatterpolar(
+            r=t_vals,
+            theta=cats,
+            fill="toself",
+            name=target_name,
+            fillcolor="rgba(26,108,245,0.15)",
+            line=dict(color=COLORS["primary"], width=2.5),
+        )
+    )
 
     _fig_defaults(fig, height=380)
     fig.update_layout(
@@ -480,40 +512,47 @@ def valuation_gauge(
     range_min = min(current_price * 0.3, p5 * 0.8)
     range_max = max(current_price * 2.0, p95 * 1.2)
 
-    fig = go.Figure(go.Indicator(
-        mode="gauge+number+delta",
-        value=current_price,
-        delta=dict(
-            reference=intrinsic_value,
-            valueformat="$,.2f",
-            increasing=dict(color=COLORS["bear"]),   # Higher price = overvalued
-            decreasing=dict(color=COLORS["bull"]),   # Lower price = undervalued
-        ),
-        gauge=dict(
-            axis=dict(
-                range=[range_min, range_max],
-                tickfont=dict(color="#8b9cc8"),
-                tickformat="$,.0f",
+    fig = go.Figure(
+        go.Indicator(
+            mode="gauge+number+delta",
+            value=current_price,
+            delta=dict(
+                reference=intrinsic_value,
+                valueformat="$,.2f",
+                increasing=dict(color=COLORS["bear"]),  # Higher price = overvalued
+                decreasing=dict(color=COLORS["bull"]),  # Lower price = undervalued
             ),
-            bar=dict(color=COLORS["primary"], thickness=0.3),
-            bgcolor="rgba(15,22,40,0.9)",
-            bordercolor="#1e2d4a",
-            steps=[
-                dict(range=[range_min, p5], color="rgba(0,200,81,0.25)"),
-                dict(range=[p5, intrinsic_value * 0.85], color="rgba(0,200,81,0.12)"),
-                dict(range=[intrinsic_value * 0.85, intrinsic_value * 1.15], color="rgba(240,180,41,0.15)"),
-                dict(range=[intrinsic_value * 1.15, p95], color="rgba(255,68,68,0.12)"),
-                dict(range=[p95, range_max], color="rgba(255,68,68,0.25)"),
-            ],
-            threshold=dict(
-                line=dict(color=COLORS["gold"], width=4),
-                thickness=0.85,
-                value=intrinsic_value,
+            gauge=dict(
+                axis=dict(
+                    range=[range_min, range_max],
+                    tickfont=dict(color="#8b9cc8"),
+                    tickformat="$,.0f",
+                ),
+                bar=dict(color=COLORS["primary"], thickness=0.3),
+                bgcolor="rgba(15,22,40,0.9)",
+                bordercolor="#1e2d4a",
+                steps=[
+                    dict(range=[range_min, p5], color="rgba(0,200,81,0.25)"),
+                    dict(range=[p5, intrinsic_value * 0.85], color="rgba(0,200,81,0.12)"),
+                    dict(
+                        range=[intrinsic_value * 0.85, intrinsic_value * 1.15],
+                        color="rgba(240,180,41,0.15)",
+                    ),
+                    dict(range=[intrinsic_value * 1.15, p95], color="rgba(255,68,68,0.12)"),
+                    dict(range=[p95, range_max], color="rgba(255,68,68,0.25)"),
+                ],
+                threshold=dict(
+                    line=dict(color=COLORS["gold"], width=4),
+                    thickness=0.85,
+                    value=intrinsic_value,
+                ),
             ),
-        ),
-        title=dict(text=f"{ticker} — Current Price vs Intrinsic Value", font=dict(color="#e8edf8")),
-        number=dict(prefix="$", valueformat=",.2f", font=dict(color="#e8edf8")),
-    ))
+            title=dict(
+                text=f"{ticker} — Current Price vs Intrinsic Value", font=dict(color="#e8edf8")
+            ),
+            number=dict(prefix="$", valueformat=",.2f", font=dict(color="#e8edf8")),
+        )
+    )
 
     _fig_defaults(fig, height=350)
     fig.update_layout(
@@ -537,37 +576,46 @@ def financial_bar_chart(
     """Bar chart for financial metrics with growth rate overlay."""
     fig = make_subplots(specs=[[{"secondary_y": True}]])
 
-    fig.add_trace(go.Bar(
-        x=years,
-        y=values,
-        name=label,
-        marker=dict(
-            color=color,
-            opacity=0.85,
-            line=dict(color=color, width=0.5),
+    fig.add_trace(
+        go.Bar(
+            x=years,
+            y=values,
+            name=label,
+            marker=dict(
+                color=color,
+                opacity=0.85,
+                line=dict(color=color, width=0.5),
+            ),
+            text=[f"${v / 1e9:.1f}B" if abs(v) > 1e8 else f"${v / 1e6:.0f}M" for v in values],
+            textposition="auto",
+            textfont=dict(color="white"),
         ),
-        text=[f"${v / 1e9:.1f}B" if abs(v) > 1e8 else f"${v / 1e6:.0f}M" for v in values],
-        textposition="auto",
-        textfont=dict(color="white"),
-    ), secondary_y=False)
+        secondary_y=False,
+    )
 
     if show_growth and len(values) > 1:
         growth_rates = [0] + [
-            (values[i] - values[i - 1]) / abs(values[i - 1]) * 100
-            if values[i - 1] != 0 else 0
+            (values[i] - values[i - 1]) / abs(values[i - 1]) * 100 if values[i - 1] != 0 else 0
             for i in range(1, len(values))
         ]
-        fig.add_trace(go.Scatter(
-            x=years,
-            y=growth_rates,
-            name="YoY Growth %",
-            mode="lines+markers",
-            line=dict(color=COLORS["gold"], width=2, dash="dot"),
-            marker=dict(size=6, color=COLORS["gold"]),
-        ), secondary_y=True)
+        fig.add_trace(
+            go.Scatter(
+                x=years,
+                y=growth_rates,
+                name="YoY Growth %",
+                mode="lines+markers",
+                line=dict(color=COLORS["gold"], width=2, dash="dot"),
+                marker=dict(size=6, color=COLORS["gold"]),
+            ),
+            secondary_y=True,
+        )
 
-        fig.update_yaxes(title_text="Growth Rate (%)", secondary_y=True,
-                         ticksuffix="%", tickfont=dict(color="#8b9cc8"))
+        fig.update_yaxes(
+            title_text="Growth Rate (%)",
+            secondary_y=True,
+            ticksuffix="%",
+            tickfont=dict(color="#8b9cc8"),
+        )
 
     _fig_defaults(fig, height=380)
     fig.update_layout(
@@ -595,16 +643,18 @@ def margin_trend_chart(
         (net_margins, "Net Margin", COLORS["bull"]),
     ]:
         clean = [m * 100 if m and abs(m) <= 1 else m for m in margins]
-        fig.add_trace(go.Scatter(
-            x=years,
-            y=clean,
-            name=name,
-            mode="lines+markers",
-            line=dict(color=color, width=2),
-            marker=dict(size=7, color=color),
-            fill="tozeroy",
-            fillcolor=f"rgba{tuple(int(color.lstrip('#')[i:i+2], 16) for i in (0, 2, 4)) + (0.04,)}",
-        ))
+        fig.add_trace(
+            go.Scatter(
+                x=years,
+                y=clean,
+                name=name,
+                mode="lines+markers",
+                line=dict(color=color, width=2),
+                marker=dict(size=7, color=color),
+                fill="tozeroy",
+                fillcolor=f"rgba{tuple(int(color.lstrip('#')[i:i+2], 16) for i in (0, 2, 4)) + (0.04,)}",
+            )
+        )
 
     _fig_defaults(fig, height=380)
     fig.update_layout(
@@ -620,14 +670,16 @@ def violin_plot(values: np.ndarray, current_price: float, ticker: str) -> go.Fig
     """Violin + box plot for Monte Carlo distribution."""
     fig = go.Figure()
 
-    fig.add_trace(go.Violin(
-        y=values,
-        box_visible=True,
-        meanline_visible=True,
-        fillcolor="rgba(26,108,245,0.15)",
-        line_color=COLORS["primary"],
-        name="Intrinsic Value Distribution",
-    ))
+    fig.add_trace(
+        go.Violin(
+            y=values,
+            box_visible=True,
+            meanline_visible=True,
+            fillcolor="rgba(26,108,245,0.15)",
+            line_color=COLORS["primary"],
+            name="Intrinsic Value Distribution",
+        )
+    )
 
     fig.add_hline(
         y=current_price,

@@ -16,6 +16,7 @@ from loguru import logger
 
 try:
     import shap
+
     HAS_SHAP = True
 except ImportError:
     HAS_SHAP = False
@@ -29,20 +30,22 @@ class SHAPResult:
     ticker: str
     model_name: str
     feature_names: list[str]
-    shap_values: Optional[np.ndarray]          # shape: (n_samples, n_features)
-    base_value: Optional[float]                 # Model's expected value
-    feature_importances: dict[str, float]       # Global mean |SHAP|
-    top_positive_drivers: list[dict]            # Features increasing value
-    top_negative_drivers: list[dict]            # Features decreasing value
+    shap_values: Optional[np.ndarray]  # shape: (n_samples, n_features)
+    base_value: Optional[float]  # Model's expected value
+    feature_importances: dict[str, float]  # Global mean |SHAP|
+    top_positive_drivers: list[dict]  # Features increasing value
+    top_negative_drivers: list[dict]  # Features decreasing value
     natural_language_explanation: str
     notes: list[str] = field(default_factory=list)
 
     def to_importance_df(self) -> pd.DataFrame:
         """Return global feature importances as a DataFrame."""
-        return pd.DataFrame([
-            {"Feature": k, "Mean |SHAP|": v}
-            for k, v in sorted(self.feature_importances.items(), key=lambda x: -x[1])
-        ])
+        return pd.DataFrame(
+            [
+                {"Feature": k, "Mean |SHAP|": v}
+                for k, v in sorted(self.feature_importances.items(), key=lambda x: -x[1])
+            ]
+        )
 
 
 class SHAPExplainer:
@@ -107,7 +110,9 @@ class SHAPExplainer:
 
         # Top drivers for the LAST row (most recent prediction)
         last_shap = shap_values[-1] if shap_values.ndim == 2 else shap_values
-        base_value = float(explainer.expected_value) if hasattr(explainer, "expected_value") else 0.0
+        base_value = (
+            float(explainer.expected_value) if hasattr(explainer, "expected_value") else 0.0
+        )
 
         drivers = sorted(
             zip(feature_names, last_shap.tolist()),
@@ -116,13 +121,23 @@ class SHAPExplainer:
         )
 
         top_positive = [
-            {"feature": name, "shap_value": val, "pct_contribution": abs(val) / (sum(abs(v) for _, v in drivers) + 1e-10)}
-            for name, val in drivers if val > 0
+            {
+                "feature": name,
+                "shap_value": val,
+                "pct_contribution": abs(val) / (sum(abs(v) for _, v in drivers) + 1e-10),
+            }
+            for name, val in drivers
+            if val > 0
         ][:5]
 
         top_negative = [
-            {"feature": name, "shap_value": val, "pct_contribution": abs(val) / (sum(abs(v) for _, v in drivers) + 1e-10)}
-            for name, val in drivers if val < 0
+            {
+                "feature": name,
+                "shap_value": val,
+                "pct_contribution": abs(val) / (sum(abs(v) for _, v in drivers) + 1e-10),
+            }
+            for name, val in drivers
+            if val < 0
         ][:5]
 
         nl_explanation = self._generate_narrative(
@@ -203,9 +218,7 @@ class SHAPExplainer:
 
         return "\n".join(lines)
 
-    def _dummy_result(
-        self, ticker: str, model_name: str, X_train: pd.DataFrame
-    ) -> SHAPResult:
+    def _dummy_result(self, ticker: str, model_name: str, X_train: pd.DataFrame) -> SHAPResult:
         """Return empty result when SHAP is unavailable."""
         return SHAPResult(
             ticker=ticker,

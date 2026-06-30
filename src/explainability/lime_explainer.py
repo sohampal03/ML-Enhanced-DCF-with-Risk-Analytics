@@ -12,6 +12,7 @@ from loguru import logger
 
 try:
     from lime import lime_tabular
+
     HAS_LIME = True
 except ImportError:
     HAS_LIME = False
@@ -21,6 +22,7 @@ except ImportError:
 @dataclass
 class LIMEResult:
     """Output of the LIME explainability engine."""
+
     ticker: str
     model_name: str
     feature_names: List[str]
@@ -42,7 +44,8 @@ class LIMEExplainer:
     ) -> LIMEResult:
         if not HAS_LIME:
             return LIMEResult(
-                ticker=ticker, model_name=model_name,
+                ticker=ticker,
+                model_name=model_name,
                 feature_names=X_train.columns.tolist(),
                 lime_importances={},
                 explanation_text="LIME not installed. Run: pip install lime",
@@ -65,7 +68,8 @@ class LIMEExplainer:
             text = self._narrative(importances, ticker)
 
             return LIMEResult(
-                ticker=ticker, model_name=model_name,
+                ticker=ticker,
+                model_name=model_name,
                 feature_names=X_train.columns.tolist(),
                 lime_importances=importances,
                 explanation_text=text,
@@ -73,7 +77,8 @@ class LIMEExplainer:
         except Exception as e:
             logger.error(f"LIME failed: {e}")
             return LIMEResult(
-                ticker=ticker, model_name=model_name,
+                ticker=ticker,
+                model_name=model_name,
                 feature_names=X_train.columns.tolist(),
                 lime_importances={},
                 explanation_text=f"LIME explanation failed: {e}",

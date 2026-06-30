@@ -85,7 +85,9 @@ def timer(func: F) -> F:
 # ── Retry with exponential backoff ────────────────────────────────────────────
 
 
-def with_retry(max_attempts: int = 3, wait_min: float = 1.0, wait_max: float = 10.0) -> Callable[[F], F]:
+def with_retry(
+    max_attempts: int = 3, wait_min: float = 1.0, wait_max: float = 10.0
+) -> Callable[[F], F]:
     """Retry decorator with exponential backoff for API calls."""
     return retry(
         stop=stop_after_attempt(max_attempts),

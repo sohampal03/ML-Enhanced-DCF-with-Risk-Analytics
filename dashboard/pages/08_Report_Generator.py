@@ -1,7 +1,9 @@
 """Page 9: Report Generator — Export PDF/HTML institutional reports"""
+
 from __future__ import annotations
 import sys
 from pathlib import Path
+
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 import io
@@ -19,7 +21,8 @@ if CSS_FILE.exists():
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
 if "report" not in st.session_state or not st.session_state.report:
-    st.warning("⚠️ Please run an analysis first."); st.stop()
+    st.warning("⚠️ Please run an analysis first.")
+    st.stop()
 
 report = st.session_state.report
 dcf = report.dcf_result
@@ -34,8 +37,11 @@ def generate_html_report(report) -> str:
     ts = datetime.datetime.now().strftime("%B %d, %Y")
 
     rec_color = {
-        "STRONG BUY": "#00c851", "BUY": "#00c851",
-        "HOLD": "#f0b429", "SELL": "#ff4444", "STRONG SELL": "#ff4444",
+        "STRONG BUY": "#00c851",
+        "BUY": "#00c851",
+        "HOLD": "#f0b429",
+        "SELL": "#ff4444",
+        "STRONG SELL": "#ff4444",
     }.get(dcf.recommendation if dcf else "HOLD", "#8b9cc8")
 
     html = f"""<!DOCTYPE html>
@@ -137,27 +143,30 @@ def generate_html_report(report) -> str:
 
 
 # ── Page UI ───────────────────────────────────────────────────────────────────
-st.markdown("""
+st.markdown(
+    """
     <h1 style="font-size:32px;font-weight:900;color:#e8edf8;margin-bottom:8px;">📄 Report Generator</h1>
     <div style="color:#8b9cc8;margin-bottom:28px;">Export institutional-quality investment reports</div>
-""", unsafe_allow_html=True)
+""",
+    unsafe_allow_html=True,
+)
 
 col_opts, col_preview = st.columns([1, 2])
 
 with col_opts:
     section_divider("Report Options")
-    
+
     include_dcf = st.checkbox("Include DCF Analysis", value=True)
     include_mc = st.checkbox("Include Monte Carlo", value=True)
     include_comps = st.checkbox("Include Peer Comparison", value=True)
     include_forecasts = st.checkbox("Include ML Forecasts", value=True)
-    
+
     st.markdown("---")
-    
+
     report_format = st.selectbox("Export Format", ["HTML Report", "CSV Data Export"])
-    
+
     st.markdown("---")
-    
+
     if st.button("📄 Generate Report", type="primary", use_container_width=True):
         with st.spinner("Generating institutional report..."):
             if report_format == "HTML Report":
@@ -184,9 +193,10 @@ with col_opts:
 
 with col_preview:
     section_divider("Report Preview")
-    
+
     if dcf and info:
-        st.markdown(f"""
+        st.markdown(
+            f"""
             <div style="background:#111827;border:1px solid #1e2d4a;border-radius:12px;padding:28px;">
                 <div style="font-size:11px;color:#f0b429;font-weight:700;letter-spacing:2px;margin-bottom:16px;">
                     VALUATION RESEARCH REPORT
@@ -215,4 +225,6 @@ with col_preview:
                 </div>
                 {"<div style='background:rgba(26,108,245,0.1);border-radius:8px;padding:12px;color:#8b9cc8;font-size:12px;'>" + f"Monte Carlo: {report.monte_carlo.n_simulations:,} sims · P(Undervalued) = {report.monte_carlo.prob_undervalued:.1%} · Median IV = {format_currency(report.monte_carlo.median_value)}" + "</div>" if report.monte_carlo else ""}
             </div>
-        """, unsafe_allow_html=True)
+        """,
+            unsafe_allow_html=True,
+        )

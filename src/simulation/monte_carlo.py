@@ -35,9 +35,9 @@ class MonteCarloAssumption:
 
     name: str
     base: float
-    std: float        # Standard deviation
+    std: float  # Standard deviation
     distribution: str = "normal"  # 'normal', 'lognormal', 'triangular'
-    low: Optional[float] = None   # For triangular
+    low: Optional[float] = None  # For triangular
     high: Optional[float] = None  # For triangular
     clip_min: Optional[float] = None
     clip_max: Optional[float] = None
@@ -94,9 +94,9 @@ class MonteCarloResult:
     p95: float
 
     # Probabilities
-    prob_undervalued: float   # P(intrinsic > current)
-    prob_overvalued: float    # P(intrinsic < current)
-    prob_in_range: float      # P(within ±15% of current)
+    prob_undervalued: float  # P(intrinsic > current)
+    prob_overvalued: float  # P(intrinsic < current)
+    prob_in_range: float  # P(within ±15% of current)
 
     # Parameter sensitivities for tornado chart
     tornado_data: dict = field(default_factory=dict)
@@ -105,14 +105,32 @@ class MonteCarloResult:
     assumptions: list[MonteCarloAssumption] = field(default_factory=list)
 
     def to_percentile_table(self) -> pd.DataFrame:
-        return pd.DataFrame({
-            "Percentile": ["5th (Bear)", "10th", "25th", "50th (Base)", "75th", "90th", "95th (Bull)"],
-            "Intrinsic Value": [self.p5, self.p10, self.p25, self.p50, self.p75, self.p90, self.p95],
-            "vs Current Price": [
-                f"{(v / self.current_price - 1):.1%}" if self.current_price > 0 else "N/A"
-                for v in [self.p5, self.p10, self.p25, self.p50, self.p75, self.p90, self.p95]
-            ],
-        })
+        return pd.DataFrame(
+            {
+                "Percentile": [
+                    "5th (Bear)",
+                    "10th",
+                    "25th",
+                    "50th (Base)",
+                    "75th",
+                    "90th",
+                    "95th (Bull)",
+                ],
+                "Intrinsic Value": [
+                    self.p5,
+                    self.p10,
+                    self.p25,
+                    self.p50,
+                    self.p75,
+                    self.p90,
+                    self.p95,
+                ],
+                "vs Current Price": [
+                    f"{(v / self.current_price - 1):.1%}" if self.current_price > 0 else "N/A"
+                    for v in [self.p5, self.p10, self.p25, self.p50, self.p75, self.p90, self.p95]
+                ],
+            }
+        )
 
 
 class MonteCarloSimulator:
@@ -171,14 +189,17 @@ class MonteCarloSimulator:
 
         # ── Compute statistics ─────────────────────────────────────────────────
         from scipy import stats as sp_stats
+
         percentiles = np.percentile(intrinsic_clean, [5, 10, 25, 50, 75, 90, 95])
 
         prob_under = float(np.mean(intrinsic_clean > current_price))
         prob_over = float(np.mean(intrinsic_clean < current_price))
-        prob_in_range = float(np.mean(
-            (intrinsic_clean >= current_price * 0.85) &
-            (intrinsic_clean <= current_price * 1.15)
-        ))
+        prob_in_range = float(
+            np.mean(
+                (intrinsic_clean >= current_price * 0.85)
+                & (intrinsic_clean <= current_price * 1.15)
+            )
+        )
 
         # ── Tornado sensitivity ────────────────────────────────────────────────
         tornado_data = self._compute_tornado(samples, intrinsic_values, assumptions)
@@ -214,9 +235,7 @@ class MonteCarloSimulator:
         )
         return result
 
-    def _build_assumptions(
-        self, dcf: DCFResult, overrides: dict
-    ) -> list[MonteCarloAssumption]:
+    def _build_assumptions(self, dcf: DCFResult, overrides: dict) -> list[MonteCarloAssumption]:
         """Build parameter distribution list from DCF base case."""
         base_growth = float(np.mean(dcf.revenue_growth_rates)) if dcf.revenue_growth_rates else 0.05
 
@@ -282,10 +301,10 @@ class MonteCarloSimulator:
         tax = dcf_result.tax_rate
 
         revenue_growth = samples["revenue_growth"]  # shape: (n,)
-        ebit_margin = samples["ebit_margin"]         # shape: (n,)
-        wacc = samples["wacc"]                       # shape: (n,)
-        tgr = samples["terminal_growth"]             # shape: (n,)
-        capex_pct = samples["capex_pct"]             # shape: (n,)
+        ebit_margin = samples["ebit_margin"]  # shape: (n,)
+        wacc = samples["wacc"]  # shape: (n,)
+        tgr = samples["terminal_growth"]  # shape: (n,)
+        capex_pct = samples["capex_pct"]  # shape: (n,)
 
         # Forecast revenues (shape: n × years)
         revenues = np.zeros((n, years))
@@ -298,7 +317,12 @@ class MonteCarloSimulator:
         # FCFF per year (simplified: NOPAT + 4% D&A - ΔNWC(2%) - CAPEX)
         da_pct = 0.04
         nwc_pct = 0.10
-        fcff_per_year = revenues * (ebit_margin[:, np.newaxis] * (1 - tax) + da_pct - nwc_pct * 0.1 - capex_pct[:, np.newaxis])
+        fcff_per_year = revenues * (
+            ebit_margin[:, np.newaxis] * (1 - tax)
+            + da_pct
+            - nwc_pct * 0.1
+            - capex_pct[:, np.newaxis]
+        )
 
         # Discount factors
         t_arr = np.arange(1, years + 1)
