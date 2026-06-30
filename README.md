@@ -53,7 +53,7 @@ The dashboard features a Bloomberg Terminal-inspired dark mode with:
 
 ## 🚀 Quick Start
 
-### Option 1: Local Development (Recommended)
+### Local Development (Recommended)
 
 ```bash
 # 1. Clone the repository
@@ -75,18 +75,6 @@ streamlit run dashboard/app.py
 ```
 
 The dashboard will be available at **http://localhost:8501**
-
-### Option 2: Docker Compose (Full Stack)
-
-```bash
-# Build and start all services
-docker-compose up --build
-
-# Services:
-# Dashboard:  http://localhost:8501
-# API:        http://localhost:8000
-# API Docs:   http://localhost:8000/docs
-```
 
 ---
 
@@ -131,8 +119,6 @@ ai_business_valuation/
 │
 ├── configs/settings.py         # Pydantic BaseSettings
 ├── tests/                      # pytest unit + integration tests
-├── Dockerfile                  # Multi-stage Docker build
-├── docker-compose.yml          # Full stack deployment
 └── .github/workflows/ci.yml    # GitHub Actions CI/CD
 ```
 
@@ -224,9 +210,6 @@ User → Streamlit Dashboard → ValuationOrchestrator → {
 2. Set build command: `pip install -r requirements.txt`
 3. Set start command: `streamlit run dashboard/app.py --server.port=$PORT`
 4. Set environment variables in Render dashboard
-
-### AWS/GCP
-See `docker-compose.yml` for a containerized deployment template.
 
 ---
 
