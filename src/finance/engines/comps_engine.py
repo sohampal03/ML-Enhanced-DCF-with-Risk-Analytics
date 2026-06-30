@@ -20,7 +20,6 @@ from loguru import logger
 from src.data.schemas.financial_schemas import FinancialData
 from src.utils.helpers import format_multiple, safe_divide
 
-
 # Sector → Peer tickers mapping (curated list)
 SECTOR_PEERS: dict[str, list[str]] = {
     "Technology": ["AAPL", "MSFT", "GOOGL", "META", "NVDA", "AVGO", "ORCL", "ADBE", "CRM"],

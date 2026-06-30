@@ -12,7 +12,6 @@ from typing import Literal
 from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-
 # Project root
 ROOT_DIR = Path(__file__).parent.parent
 

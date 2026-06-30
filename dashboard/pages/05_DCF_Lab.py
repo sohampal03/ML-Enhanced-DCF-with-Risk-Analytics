@@ -73,8 +73,7 @@ st.markdown(
 with st.expander("📚 How DCF Works — Formula & Theory", expanded=False):
     c1, c2 = st.columns(2)
     with c1:
-        st.markdown(
-            """
+        st.markdown("""
         **Discounted Cash Flow (DCF) Formula:**
         
         ```
@@ -90,11 +89,9 @@ with st.expander("📚 How DCF Works — Formula & Theory", expanded=False):
         **Equity Value = Enterprise Value − Debt + Cash**
         
         **Intrinsic Value / Share = Equity Value / Shares Outstanding**
-        """
-        )
+        """)
     with c2:
-        st.markdown(
-            """
+        st.markdown("""
         **Key Assumptions & Their Impact:**
         
         | Assumption | ↑ Increases | ↓ Decreases |
@@ -107,8 +104,7 @@ with st.expander("📚 How DCF Works — Formula & Theory", expanded=False):
         
         > **Rule of thumb:** A 1% change in WACC typically changes intrinsic value by 10–20%.
         > Terminal value often represents 60–80% of total value in high-growth companies.
-        """
-        )
+        """)
 
 st.markdown("---")
 
