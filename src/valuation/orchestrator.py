@@ -177,6 +177,7 @@ class ValuationOrchestrator:
             if revenue_growth_override is not None:
                 # Declining from override to 3%
                 import numpy as np
+
                 growth_rates = list(np.linspace(revenue_growth_override, 0.03, forecast_years))
 
             report.dcf_result = self.dcf_engine.compute(

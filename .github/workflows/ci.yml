@@ -44,17 +44,16 @@ jobs:
           pip install -r requirements.txt
       - name: Run unit tests
         env:
-          PYTHONPATH: ${{ github.workspace }}/ai_business_valuation
+          PYTHONPATH: ${{ github.workspace }}
           DATA_PRIMARY_ADAPTER: yfinance
           ML_OPTUNA_TRIALS: "5"
           SIM_N_SIMULATIONS: "100"
         run: |
-          cd ai_business_valuation
           pytest tests/unit/ -v --cov=src --cov-report=xml --cov-report=term-missing
       - name: Upload coverage
         uses: codecov/codecov-action@v4
         with:
-          files: ./ai_business_valuation/coverage.xml
+          files: ./coverage.xml
           fail_ci_if_error: false
 
   # ── Integration Tests ────────────────────────────────────────────────────────
@@ -72,8 +71,7 @@ jobs:
         run: pip install -r requirements.txt
       - name: Run integration tests
         env:
-          PYTHONPATH: ${{ github.workspace }}/ai_business_valuation
+          PYTHONPATH: ${{ github.workspace }}
           SIM_N_SIMULATIONS: "500"
         run: |
-          cd ai_business_valuation
           pytest tests/integration/ -v -x
